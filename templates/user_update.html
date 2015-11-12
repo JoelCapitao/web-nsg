@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Editing{% endblock %}
+{% block content %}
+    <div class="container">
+    <div class="row">
+        <h2>Editing {{ user.firstname }} {{ user.lastname }}</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="alert alert-danger" style="display : {{ alert }}">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                    ×</button>
+               <span class="glyphicon glyphicon-hand-right"></span> <strong>{{ message }}</strong>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-5">
+            <form method="POST" action="/user/update/{{ user.id }}" enctype="multipart/form-data">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="lastname" id="lastname" value="{{ user.lastname }}" required>
+                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="firstname" id="firstname" value="{{ user.firstname }}" required>
+                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                    </div>
+                    <div class="input-group" data-validate="email">
+                        <input type="text" class="form-control" name="email" id="email" value="{{ user.mail }}" required>
+                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                    </div>
+                    <div class="input-group" data-validate="quadri">
+                        <input type="text" class="form-control" name="quadri" id="quadri" value="{{ user.uid }}" required>
+                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                    </div>
+                </div>
+            <button type="submit" class="btn btn-primary col-xs-12">Submit</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

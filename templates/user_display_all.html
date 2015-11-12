@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}User{% endblock %}
+{% block content %}
+    <div class="container">
+    <div class="row">
+        <h2>User</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-10">
+            <div>
+                <a class="btn btn-primary" href="/user/add" role="button">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>New user</span>
+                </a>
+            </div>
+            <div class="panel panel-primary filterable">
+                <div class="panel-heading">
+                    <h3 class="panel-title">User</h3>
+                    <div class="pull-right">
+                        <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter</button>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr class="filters">
+                            <th><input type="hidden" class="form-control" placeholder=""</th>
+                            <th><input type="text" class="form-control" placeholder="Last Name" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="First Name" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Email" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Function" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Quadri" disabled></th>
+                            <th><input type="hidden" class="form-control" placeholder=""</th>
+                            <th><input type="hidden" class="form-control" placeholder=""></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                        {% for user in user %}
+                            <td><a href="{{ url_for('user_display', id=user.id) }}">
+                                        <i class="glyphicon glyphicon-user"></i>
+                                </a>
+                            </td>
+                            <td>{{ user.lastname }}</td>
+                            <td>{{ user.firstname }}</td>
+                            <td>{{ user.mail }}</td>
+                            <td>{{ user.function }}</td>
+                            <td>{{ user.uid }}</td>
+                            <td>
+                                <a href="{{ url_for('user_update', id=user.id) }}">
+                                    <i class="glyphicon glyphicon-edit"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('user_delete', id=user.id) }}">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </a>
+                            </td>
+                           </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+{% endblock %}

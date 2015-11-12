@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC> 
+<html lang="en">
+<head>
+{% block head %}
+    <title>{% block title %}{% endblock %} - My Webpage</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/own.css') }}">
+{% endblock %}
+</head>
+<body>
+	<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="navbar-inner">	 
+		<div class="container">
+			<a href="#" class="navbar-brand">NetScriptGen</a> <button class="navbar-toggle"
+		    data-toggle="collapse" data-target=".navHeaderCollapse"></button>
+	    </div>
+	</div>
+	</div>
+	<div class="container">
+   		<div class="row">
+	   		<div class="col-md-2">
+	   			<h3>Menu</h3>
+	   			<ul class="nav nav-pills nav-stacked">
+	              <li><a href="/index.php/project/display">Project</a></li>
+	              <li><a href="{{ url_for('customer_display_all') }}">Client</a></li>
+	              <li><a href="{{ url_for('user_display_all') }}">User</a></li>
+	            </ul>
+	   		</div>
+	   		<div class="col-md-10">
+				<div id="content">{% block content %}{% endblock %}</div>
+			</div>
+		</div>
+	</div>
+	<footer class="footer">
+		<div class="container">
+	        <p><a href="http://www.telindus.fr/" target="_blank" >© 2015 - SFR Business</a></p>
+      </div>
+    </footer>
+    {% block javascript %}
+        <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    {% endblock %}
+</body>
+</html>

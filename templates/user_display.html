@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ user.firstname }} {{ user.lastname }}{% endblock %}
+{% block content %}
+      <div class="container">
+        <div class="row">
+        <h2>{{ user.firstname }} {{ user.lastname }}</h2>
+    </div>
+    <div class="row margin-10">
+    <div class="col-md-5">
+        <div class="alert alert-danger" style="display : {{ alert }}">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                ×</button>
+           <span class="glyphicon glyphicon-hand-right"></span> <strong>{{ message }}</strong>
+        </div>
+    </div>
+    </div>
+      <div class="row">
+        <div class="col-md-6 col-lg-6 " >
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">{{ user.firstname }} {{ user.lastname }}</h3>
+            </div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-md-3 col-lg-3 " align="center"> <img alt="User Pic" src="https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=100" class="img-circle"> </div>
+                <div class=" col-md-9 col-lg-9 ">
+                  <table class="table table-user-information">
+                    <tbody>
+                      <tr>
+                        <td>Function</td>
+                        <td>{{ user.function }}</td>
+                      </tr>
+                      <tr>
+                        <td>Email</td>
+                        <td><a href="mailto:<{{ user.mail }}">{{ user.mail }}</a></td>
+                      </tr>
+                      <tr>
+                        <td>Quadri</td>
+                        <td><{{ user.uid }}</td>
+                      </tr>
+                      <tr>
+                        <td>Phone Number</td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <a href="#" class="btn btn-primary">View Project</a>
+                </div>
+              </div>
+            </div>
+                 <div class="panel-footer">
+                        <a href="mailto:{{ user.mail }}" data-toggle="tooltip" type="button" class="btn btn-sm btn-primary "><i class="glyphicon glyphicon-envelope"></i></a>
+                        <span class="pull-right">
+                            <a href="{{ url_for('user_update', id=user.id) }}" data-original-title="Edit this user" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
+                            <a href="{{ url_for('user_delete', id=user.id) }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-remove"></i></a>
+                        </span>
+                    </div>
+          </div>
+        </div>
+      </div>
+  </div>
+
+{% endblock %}

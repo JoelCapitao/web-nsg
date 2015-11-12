@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}New user{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h2>New User</h2>
+        </div>
+        <div class="row">
+            <div class="col-sm-5">
+                <form method="POST" action="/user/add" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Last Name" required>
+                            <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="firstname" id="firstname" placeholder="First Name" required>
+                            <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                        </div>
+                        <div class="input-group" data-validate="email">
+                            <input type="text" class="form-control" name="email" id="email" placeholder="Email" required>
+                            <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="password" id="password" placeholder="Password" required>
+                            <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                        </div>
+                        <div class="input-group" data-validate="quadri">
+                            <input type="text" class="form-control" name="quadri" id="quadri" placeholder="Quadri" required>
+                            <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                        </div>
+                    </div>
+                <button type="submit" class="btn btn-primary col-xs-12">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
