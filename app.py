@@ -137,7 +137,7 @@ def customer_delete(id):
         flash(error)
     return redirect(url_for('customer_display_all'))
 
-@app.route('/user/display/<id>', methods=['GET','POST'])
+@app.route('/customer/display/<id>', methods=['GET','POST'])
 def customer_display(id):
     customer = Customer.query.get(id)
     if customer is None:
