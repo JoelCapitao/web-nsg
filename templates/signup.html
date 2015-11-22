@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC>
+<html lang="en">
+<head>
+{% block head %}
+    <title>{% block title %}{% endblock %} - My Webpage</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/own.css') }}">
+{% endblock %}
+</head>
+<body>
+<div class="row">
+<div class="col-sm-2">
+</div>
+<div class="col-sm-8 well" style="background-color: #ffffff">
+<div class="container">
+<div class="row">
+<div class="col-sm-2">
+</div>
+<div class="col-sm-8">
+<form action="{{url_for('signup')}}" class="form-horizontal" method="POST">
+        {{ form.hidden_tag() }}
+        <div class="heading">
+        <h4 class="form-heading">Publish your biography to the world!</h4>
+        </div>
+        <div class="form-group {% if form.email.errors %} has-error {% endif %}">
+        {{form.email.label(class="col-sm-4")}}
+        <div class="col-sm-3">
+        {{ form.email(placeholder="E.g. brucewayne@wayne.com", class="form-control") }}
+        </div>
+        <p class="col-sm-5 help-block">
+        {{ form.email.errors[0] }}
+
+        </div>
+        <div class="form-group {% if form.password.errors %} has-error {% endif %}">
+        {{form.password.label(class="col-sm-4")}}
+        <div class="col-sm-3">
+        {{ form.password(placeholder="Min. 6 Characters", class="form-control") }}
+        </div>
+        <p class="col-sm-5 help-block">
+        {{ form.password.errors[0] }}
+
+        </div>
+        <div class="form-group {% if form.username.errors %} has-error {% endif %}">
+        {{form.username.label(class="col-sm-4")}}
+        <div class="col-sm-3">
+        {{form.username(placeholder="E.g. ashwinhegde", class="form-control")}}
+        </div>
+        <p class="col-sm-5 help-block">
+        {{ form.username.errors[0] }}
+
+        </div>
+        <div class="form-group {% if form.agree.errors %} has-error {% endif %}">
+        <label class="checkbox col-sm-7">
+        {{form.agree}} {{form.agree.label}}
+        </label>
+        <p class="col-sm-5 help-block">
+        {{ form.agree.errors[0] }}
+
+        </div>
+        <button class="btn btn-success" type="submit">Sign Up</button>
+</form>
+</div>
+<div class="col-sm-2">
+</div>
+</div>
+</div>
+</div>
+<div class="col-sm-2">
+</div>
+	<footer class="footer">
+		<div class="container">
+	        <p><a href="http://www.telindus.fr/" target="_blank" >© 2015 - SFR Business</a></p>
+      </div>
+    </footer>
+    {% block javascript %}
+        <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    {% endblock %}
+</body>
+</html>

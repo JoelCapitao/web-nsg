@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Preview{% endblock %}
+{% block content %}
+    <div class="container">
+    <div class="col-sm-10">
+        <div class="row">
+            <h2>Preview</h2>
+        </div>
+        <table id="mytable" class="table table-bordred table-striped" cellspacing="0">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="checkall" /></th>
+                    <th>#</th>
+                    <th>Hostname</th>
+                    <th>Equipment</th>
+                    <th>Type</th>
+                    <th>Filling ratio</th>
+                    <th>Percentage</th>
+                    <th>View</th>
+                    <th>Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for equipment in equipments %}
+                <tr>
+                    <td><input type="checkbox" class="checkthis" /></td>
+                    <td>{{ iterator.value() }}</td>
+                    <td>{{ equipment.get_value_of_var('Hostname', wb)  }}</td>
+                    <td>{{ equipment.get_value_of_var('Equipment', wb) }}</td>
+                    <td>{{ equipment.get_value_of_var('Type', wb) }}</td>
+                    <td>{{ equipment.get_filling_ratio()  }}</td>
+                    <td>{{ equipment.get_filling_ratio_in_percentage() }}</td>
+                    <td data-toggle="collapse" data-target="#equipment{{ iterator.increment() }}" class="accordion-toggle"><button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
+                    <td><button class="btn btn-info btn-xs"><span class="glyphicon glyphicon-download-alt"></span></button></td>
+
+                </tr>
+                <tr>
+                    <td colspan="12" class="hiddenRow"><div class="accordian-body collapse" id="equipment{{ iterator.value() }}">
+                            <div class="col-sm-12">
+                                {% for error in equipment.tb %}
+                                <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                    </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+{% endblock %}

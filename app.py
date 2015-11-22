@@ -1,5 +1,22 @@
 from flask import render_template, request, flash, redirect, url_for
 from model import app, User, Customer, Project
+from netscriptgen import NetScriptGen, Integer
+
+@app.route('/project/new')
+def project_add():
+    return render_template('project.html')
+
+@app.route('/testproject')
+def project_test():
+    excel_workbook = '/Users/joel/Desktop/california.xlsx'
+    template = open('/Users/joel/Desktop/california_template.txt', 'r', -1, 'UTF-8').read()
+    nsg = NetScriptGen(excel_workbook, template)
+    nsg.extract_data()
+    equipments, scripts = nsg.get_all_equipments()
+    print(equipments)
+    return render_template('generation_preview.html', equipments=equipments, iterator=Integer(0), wb=nsg.workbook,
+                           scripts=scripts)
+
 
 
 @app.route('/user')
@@ -147,4 +164,4 @@ def customer_display(id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=5001)
+    app.run(debug=True, host="0.0.0.0", port=5002)
