@@ -71,21 +71,18 @@ class Customer(db.Model):
 class Project(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
+    client = db.Column(db.String(255), nullable=False)
     projectName = db.Column(db.String(255), nullable=False)
-    projectReferenceId = db.Column(db.String(255), nullable=False)
+    subProjectName = db.Column(db.String(255), nullable=True)
     excelFile = db.Column(db.String(255))
     templateFile = db.Column(db.String(255))
     scripts = db.Column(db.String(255))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
-    user = db.relationship('User', foreign_keys=[user_id])
-    customer = db.relationship('Customer', foreign_keys=[customer_id])
 
-    def __init__(self, projectName, projectReferenceId, excelFile, templateFile):
+    def __init__(self, client, projectName, subProjectName, excelFile, templateFile):
         self.projectName = projectName
-        self.projectReferenceId = projectReferenceId
+        self.subProjectName = subProjectName
         self.excelFile = excelFile
         self.templateFile = templateFile
 
@@ -99,6 +96,8 @@ class Project(db.Model):
     def delete(self, project):
         db.session.delete(project)
         return session_commit()
+
+
 
 db.create_all()
 db.session.commit()

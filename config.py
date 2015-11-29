@@ -5,8 +5,9 @@ class Config(object):
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = True
-    SECRET_KEY = ''
+    SECRET_KEY = 'this-really-needs-to-be-changed'
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    UPLOAD_FOLDER = ''
 
 
 class ProductionConfig(Config):
@@ -20,9 +21,8 @@ class StagingConfig(Config):
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
-    DEBUG = True
-
-
-class TestingConfig(Config):
     TESTING = True
+    DEBUG = True
+    SECRET_KEY = 'development'
+    UPLOAD_FOLDER = '/Users/joel/Desktop/upload'
 

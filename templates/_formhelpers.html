@@ -1,0 +1,29 @@
+{% macro render_field(field) %}
+    <div class="form-group" {% if field.errors %}has-error{% endif %}>
+            <label for="user">{{ field.label }}</label>
+            <div class="input-group">
+                {{ field(class="form-control", **kwargs)|safe }}
+                <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+            </div>
+            {% if field.errors %}
+            {% for e in field.errors %}
+                <p class="help-block">{{ e }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_upload_file(field) %}
+    <div class="form-group">
+            <label for="user">{{ field.label }}</label>
+            <div class="input-group">
+                {{ field(class="form-control", **kwargs) }}
+                <span class="input-group-addon"><span class="glyphicon glyphicon-file"></span></span>
+            </div>
+            {% if field.errors %}
+            {% for e in field.errors %}
+                <p class="help-block">{{ e }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endmacro %}
