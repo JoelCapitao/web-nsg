@@ -4,6 +4,7 @@ from model import app, User, Customer, Project
 from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
 from validationForm import ProjectForm
+from zipfile import ZipFile
 from flask.ext.session import Session
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
@@ -15,6 +16,7 @@ def project_new():
     if request.method == 'POST' and form.validate():
 
         project_folder = os.path.join(app.config['UPLOAD_FOLDER'], request.form['client'], request.form['subproject_name'])
+        session['project_folder'] = project_folder
         os.makedirs(project_folder, exist_ok=True)
 
         excel_file = request.files['excel_file']
@@ -48,22 +50,8 @@ def project_new():
 
 @app.route('/project/add', methods=['GET','POST'])
 def project_add():
-    form = ProjectForm(request.form)
-    print(form.validate())
-    if request.method == 'POST' and form.validate():
-        excel_file = request.files['excel_file']
-        excel_file = secure_filename(excel_file.filename)
-        template_file = request.files['template_file']
-        template_file = secure_filename(template_file.filename)
-
-        try:
-            equipments, wb = nsg_processing(excel_file, template_file)
-        except:
-            exit()
-            #TODO: Add a return page that handles this error
-
+    if request.method == 'POST':
         project_data = session.get('data')
-
         project = Project(project_data['client'],
                           project_data['project_name'],
                           project_data['subproject_name'],
@@ -73,15 +61,10 @@ def project_add():
         post_add = project.add(project)
 
         if not post_add:
-            project_folder = os.path.join(app.config['UPLOAD_FOLDER'], project.id)
-            os.makedirs(project_folder, exist_ok=True)
-            excel_file_path = os.path.join(project_folder, excel_file)
-            excel_file.save(excel_file_path)
-            template_file_path = os.path.join(project_folder, template_file)
-            template_file.save(template_file_path)
-            flash("Add was successful")
-            for equipment in equipments:
-                equipment.save_script_as(project_folder, equipment.get_value_of_var('Hostname', wb))
+            new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], project.id)
+            os.rename(project_data['project_folder'], new_project_folder)
+
+
             return render_template('generation_preview.html', equipments=equipments, iterator=Integer(0), wb=wb)
         else:
             error = post_add
@@ -244,17 +227,31 @@ def customer_display(id):
         return redirect(url_for('customer_display_all'))
     return render_template('customer_display.html', customer=customer, alert='None', message='')
 
-@app.route('/file/<id>/<filename>')
-def return_file(id, filename):
-    file = get_file(id, filename)
+@app.route('/file/<filename>')
+def return_file(filename):
+    folder = session['project_folder']
+    file = get_file(folder, filename + '.txt')
     return Response(file, mimetype="text/plain")
 
-def get_file(id, filename):
+def get_file(folder, filename):
     try:
-        file = os.path.join(app.config['UPLOAD_FOLDER'], id, filename)
+        file = os.path.join(folder, filename)
         return open(file).read()
     except IOError as exc:
         return str(exc)
+
+
+def zip_file(list_of_files, client, project, subproject):
+    if subproject:
+        zf_name = "scripts-{0}-{1}-{2}".format(client, project, subproject)
+    else:
+        zf_name = "scripts-{0}-{1}".format(client, project)
+    zf = ZipFile(zf_name, mode='w')
+    for file in list_of_files:
+        zf.write(file)
+    zf.close()
+    return zf
+
 
 
 if __name__ == '__main__':
