@@ -25,4 +25,5 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SECRET_KEY = 'development'
     UPLOAD_FOLDER = '/Users/joel/Desktop/upload'
+    DATABASE_URL = 'postgres://localhost:5432/web-nsg'
 

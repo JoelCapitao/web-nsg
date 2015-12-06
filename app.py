@@ -1,49 +1,103 @@
 import os
-from flask import render_template, request, flash, redirect, url_for
+from flask import render_template, request, flash, redirect, url_for, Response, session
 from model import app, User, Customer, Project
 from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
 from validationForm import ProjectForm
+from flask.ext.session import Session
+SESSION_TYPE = 'redis'
+SECRET_KEY = 'develop'
+
+@app.route('/project/new', methods=['GET','POST'])
+def project_new():
+    form = ProjectForm(request.form)
+    print(form.validate())
+    if request.method == 'POST' and form.validate():
+
+        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], request.form['client'], request.form['subproject_name'])
+        os.makedirs(project_folder, exist_ok=True)
+
+        excel_file = request.files['excel_file']
+        excel_file_path = os.path.join(project_folder, secure_filename(excel_file.filename))
+        excel_file.save(excel_file_path)
+
+        template_file = request.files['template_file']
+        template_file_path = os.path.join(project_folder, secure_filename(template_file.filename))
+        template_file.save(template_file_path)
+
+        project = dict()
+        for item in ('client', 'project_name', 'subproject_name'):
+            project[item] = request.form[item]
+        for item, path in [('excel_file', 'excel_file_path'), ('template_file', 'template_file_path')]:
+            project[item] = path
+        session['data'] = project
+        print(project)
+        try:
+            equipments, wb = nsg_processing(excel_file_path, template_file_path)
+        except:
+            exit()
+            #TODO: Add a return page that handles this error
+
+
+        for equipment in equipments:
+            equipment.save_script_as(project_folder, equipment.get_value_of_var('Hostname', wb))
+        return render_template('generation_preview.html', equipments=equipments, iterator=Integer(0), wb=wb)
+
+    return render_template('project.html', form=form)
+
 
 @app.route('/project/add', methods=['GET','POST'])
 def project_add():
     form = ProjectForm(request.form)
     print(form.validate())
     if request.method == 'POST' and form.validate():
-        subfolder = "{0}-{1}-{2}".format(request.form['client'], request.form['project_name'], request.form['subproject_name'])
-        os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], subfolder), exist_ok=True)
         excel_file = request.files['excel_file']
-        filename = secure_filename(excel_file.filename)
-        excel_file.save(os.path.join(app.config['UPLOAD_FOLDER'], subfolder, filename))
-
+        excel_file = secure_filename(excel_file.filename)
         template_file = request.files['template_file']
-        filename = secure_filename(template_file.filename)
-        template_file.save(os.path.join(app.config['UPLOAD_FOLDER'], subfolder, filename))
+        template_file = secure_filename(template_file.filename)
 
-        project = Project(request.form['client'],
-                          request.form['project_name'],
-                          request.form['subproject_name'],
-                          request.form['excel_file'],
-                          request.form['template_file']
+        try:
+            equipments, wb = nsg_processing(excel_file, template_file)
+        except:
+            exit()
+            #TODO: Add a return page that handles this error
+
+        project_data = session.get('data')
+
+        project = Project(project_data['client'],
+                          project_data['project_name'],
+                          project_data['subproject_name'],
+                          project_data['excel_file'],
+                          project_data['template_file']
                           )
         post_add = project.add(project)
+
         if not post_add:
+            project_folder = os.path.join(app.config['UPLOAD_FOLDER'], project.id)
+            os.makedirs(project_folder, exist_ok=True)
+            excel_file_path = os.path.join(project_folder, excel_file)
+            excel_file.save(excel_file_path)
+            template_file_path = os.path.join(project_folder, template_file)
+            template_file.save(template_file_path)
             flash("Add was successful")
-            return redirect(url_for('customer_display_all'))
+            for equipment in equipments:
+                equipment.save_script_as(project_folder, equipment.get_value_of_var('Hostname', wb))
+            return render_template('generation_preview.html', equipments=equipments, iterator=Integer(0), wb=wb)
         else:
             error = post_add
             flash(error)
-    project()
+    return render_template('project.html', form=form)
 
-def project(excel_worbook, template_file):
+
+def nsg_processing(excel_worbook, template_file):
     excel_wb = excel_worbook
     template = open(template_file, 'r', -1, 'UTF-8').read()
     nsg = NetScriptGen(excel_wb, template)
     nsg.extract_data()
-    equipments, scripts = nsg.get_all_equipments()
+    equipments = nsg.get_all_equipments()
     print(equipments)
-    return render_template('generation_preview.html', equipments=equipments, iterator=Integer(0), wb=nsg.workbook,
-                           scripts=scripts)
+    return equipments, nsg.workbook
+
 
 
 
@@ -190,5 +244,18 @@ def customer_display(id):
         return redirect(url_for('customer_display_all'))
     return render_template('customer_display.html', customer=customer, alert='None', message='')
 
+@app.route('/file/<id>/<filename>')
+def return_file(id, filename):
+    file = get_file(id, filename)
+    return Response(file, mimetype="text/plain")
+
+def get_file(id, filename):
+    try:
+        file = os.path.join(app.config['UPLOAD_FOLDER'], id, filename)
+        return open(file).read()
+    except IOError as exc:
+        return str(exc)
+
+
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5003)
+    app.run(host="0.0.0.0", port=5004)

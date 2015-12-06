@@ -46,9 +46,8 @@ class NetScriptGen(object):
     def get_all_equipments(self):
         for hostname in self.workbook['Global'].get_all_indexes():
             equipment = Equipment(hostname, self.template, self.workbook)
-            self.list_of_scripts.append(equipment.fill_out_the_template())
             self.list_of_equipments.append(equipment)
-        return self.list_of_equipments, self.list_of_equipments
+        return self.list_of_equipments
 
 
 class Integer(object):

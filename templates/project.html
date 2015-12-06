@@ -9,14 +9,14 @@
     </div>
         <div class="container">
             <div class="col-sm-7">
-                <form method="POST" action="/project/add" enctype="multipart/form-data">
+                <form method="POST" action="/project/new" enctype="multipart/form-data">
                     {{ render_field(form.client) }}
                     {{ render_field(form.project_name) }}
                     {{ render_field(form.subproject_name) }}
                     {{ render_upload_file(form.excel_file) }}
                     {{ render_upload_file(form.template_file) }}
                     <hr>
-                    <button type="submit" class="btn btn-primary col-xs-12">Submit</button>
+                    <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
                 </form>
                 <div class="modal fade" id="processing-modal" role="dialog" aria-labelledby="myModalLabel">
                     <div class="modal-dialog modal-vertical-centered">
