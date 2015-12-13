@@ -17,7 +17,7 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Project</h3>
                     <div class="pull-right">
-                        <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter</button>
+                        <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-folder-open"></span> Filter</button>
                     </div>
                 </div>
                 <table class="table">
@@ -29,7 +29,7 @@
                             <th><input type="text" class="form-control" placeholder="Subproject Name" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Excel File" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Template file" disabled></th>
-                            <th><input type="hidden" class="form-control" placeholder=""</th>
+                            <th><input type="hidden" class="form-control" placeholder=""></th>
                             <th><input type="hidden" class="form-control" placeholder=""></th>
                         </tr>
                     </thead>
@@ -37,14 +37,14 @@
                         <tr>
                         {% for p in project %}
                             <td><a href="">
-                                        <i class="glyphicon glyphicon-user"></i>
+                                        <i class="glyphicon glyphicon-folder-open"></i>
                                 </a>
                             </td>
                             <td>{{ p.client }}</td>
                             <td>{{ p.projectName }}</td>
                             <td>{{ p.subProjectName }}</td>
-                            <td><a href="/download/{{ p.id }}/{{ p.excelFile }}" class="btn btn-default btn-xs" role="button" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
-                            <td><a href="/download/{{ p.id }}/{{ p.templateFile }}" class="btn btn-default btn-xs" role="button" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a><</td>
+                            <td><a href="/download/{{ p.id }}/{{ p.excelFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
+                            <td><a href="/download/{{ p.id }}/{{ p.templateFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
                             <td>
                                 <a href="{{ url_for('project_update', id=p.id) }}">
                                     <i class="glyphicon glyphicon-edit"></i>

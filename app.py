@@ -83,7 +83,7 @@ def project_add():
             memory_file, attachment_filename = zip_file(list_of_files, name)
             #send_file(memory_file, attachment_filename=attachment_filename, as_attachment=True)
 
-            return render_template('project_display_all.html', project=project)
+            return project_display_all()
         else:
             error = post_add
             flash(error)
