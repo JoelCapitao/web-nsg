@@ -62,7 +62,7 @@ def project_add():
                           project_data['template_file']
                           )
         post_add = project.add(project)
-        id_project = lastIDof(Project)
+        id_project = lastIDofProject()
 
         if not post_add:
             print(project.client)
@@ -321,10 +321,6 @@ def zip_file(list_of_files, name):
             data.compress_type = ZIP_DEFLATED
             zf.writestr(data, file)
     return memory_file, zf_name
-
-@app.route('/test')
-def test():
-    print(str(lastIDofProject()))
 
 
 if __name__ == '__main__':

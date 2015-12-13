@@ -103,8 +103,8 @@ db.create_all()
 db.session.commit()
 
 def lastIDofProject():
-    return db.session.query(Project).order_by(Project.id.desc()).first()
-
+    obj = db.session.query(Project).order_by(Project.id.desc()).first()
+    return str(obj.id)
 
 def session_commit():
     try:
