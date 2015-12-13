@@ -76,11 +76,11 @@ class Project(db.Model):
     subProjectName = db.Column(db.String(255), nullable=True)
     excelFile = db.Column(db.String(255))
     templateFile = db.Column(db.String(255))
-    scripts = db.Column(db.String(255))
     created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
 
     def __init__(self, client, projectName, subProjectName, excelFile, templateFile):
+        self.client = client
         self.projectName = projectName
         self.subProjectName = subProjectName
         self.excelFile = excelFile
@@ -101,6 +101,9 @@ class Project(db.Model):
 
 db.create_all()
 db.session.commit()
+
+def lastIDof(table):
+    return db.session.query(table).order_by(table.id.desc()).first()
 
 
 def session_commit():

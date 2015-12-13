@@ -1,11 +1,14 @@
 import os
-from flask import render_template, request, flash, redirect, url_for, Response, session
-from model import app, User, Customer, Project
+from flask import render_template, request, flash, redirect, url_for, Response, session, send_file
+from model import app, User, Customer, Project, lastIDof
 from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
+from shutil import move
 from validationForm import ProjectForm
-from zipfile import ZipFile
+from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
+from time import localtime, time
 from flask.ext.session import Session
+from io import BytesIO
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
 
@@ -15,7 +18,7 @@ def project_new():
     print(form.validate())
     if request.method == 'POST' and form.validate():
 
-        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], request.form['client'], request.form['subproject_name'])
+        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], '{0}-{1}'.format(request.form['client'], request.form['subproject_name']))
         session['project_folder'] = project_folder
         os.makedirs(project_folder, exist_ok=True)
 
@@ -35,12 +38,12 @@ def project_new():
         session['data'] = project
         print(project)
         try:
-            equipments, wb = nsg_processing(excel_file_path, template_file_path)
+            equipments, wb, hostnames = nsg_processing(excel_file_path, template_file_path)
         except:
             exit()
             #TODO: Add a return page that handles this error
 
-
+        session['hostnames'] = hostnames
         for equipment in equipments:
             equipment.save_script_as(project_folder, equipment.get_value_of_var('Hostname', wb))
         return render_template('generation_preview.html', equipments=equipments, iterator=Integer(0), wb=wb)
@@ -59,17 +62,32 @@ def project_add():
                           project_data['template_file']
                           )
         post_add = project.add(project)
+        id_project = '3'
 
         if not post_add:
-            new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], project.id)
-            os.rename(project_data['project_folder'], new_project_folder)
+            print(project.client)
+            new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], id_project)
+            move(session['project_folder'], new_project_folder)
 
+            for hostname in session['hostnames']:
+                list_of_files = list()
+                check = request.form.get(hostname, default=False, type=bool)
+                if check:
+                    list_of_files.append(hostname + '.txt')
+            list_of_files.append(project_data['excel_file'] + '.xlsx')
+            list_of_files.append(project_data['template_file'] + '.txt')
 
-            return render_template('generation_preview.html', equipments=equipments, iterator=Integer(0), wb=wb)
+            name = dict()
+            for item in ('client', 'project_name', 'subproject_name'):
+                name[item] = project_data[item]
+            memory_file, attachment_filename = zip_file(list_of_files, name)
+            send_file(memory_file, attachment_filename=attachment_filename, as_attachment=True)
+
+            return render_template('project_display_all.html', project=project)
         else:
             error = post_add
             flash(error)
-    return render_template('project.html', form=form)
+    return render_template('project.html')
 
 
 def nsg_processing(excel_worbook, template_file):
@@ -78,10 +96,18 @@ def nsg_processing(excel_worbook, template_file):
     nsg = NetScriptGen(excel_wb, template)
     nsg.extract_data()
     equipments = nsg.get_all_equipments()
-    print(equipments)
-    return equipments, nsg.workbook
+    hostnames = nsg.get_all_equipment_names()
+    return equipments, nsg.workbook, hostnames
 
 
+@app.route('/project')
+def project_display_all():
+    project = Project.query.all()
+    for p in project:
+        print(p.id)
+        print(p.client)
+        print(p.projectName)
+    return render_template('project_display_all.html', project=project)
 
 
 @app.route('/user')
@@ -241,17 +267,19 @@ def get_file(folder, filename):
         return str(exc)
 
 
-def zip_file(list_of_files, client, project, subproject):
-    if subproject:
-        zf_name = "scripts-{0}-{1}-{2}".format(client, project, subproject)
+def zip_file(list_of_files, name):
+    memory_file = BytesIO()
+    if name['subproject_name']:
+        zf_name = "scripts-{0}-{1}-{2}".format(name['client'], name['project_name'], name['subproject_name'])
     else:
-        zf_name = "scripts-{0}-{1}".format(client, project)
-    zf = ZipFile(zf_name, mode='w')
-    for file in list_of_files:
-        zf.write(file)
-    zf.close()
-    return zf
-
+        zf_name = "scripts-{0}-{1}".format(name['client'], name['project_name'])
+    with ZipFile(memory_file, 'w') as zf:
+        for file in list_of_files:
+            data = ZipInfo(file)
+            data.date_time = localtime(time())[:6]
+            data.compress_type = ZIP_DEFLATED
+            zf.writestr(data, file)
+    return memory_file, zf_name
 
 
 if __name__ == '__main__':

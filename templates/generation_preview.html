@@ -6,6 +6,7 @@
         <div class="row">
             <h2>Preview</h2>
         </div>
+        <form method="POST" action="/project/add" enctype="multipart/form-data">
         <table id="mytable" class="table table-bordred table-striped" cellspacing="0">
             <thead>
                 <tr>
@@ -23,14 +24,14 @@
             <tbody>
                 {% for equipment in equipments %}
                 <tr>
-                    <td><input type="checkbox" class="checkthis" /></td>
+                    <td><input type="checkbox" name={{ equipment.get_value_of_var('Hostname', wb) }}  class="checkthis" /></td>
                     <td>{{ iterator.value() }}</td>
                     <td>{{ equipment.get_value_of_var('Hostname', wb)  }}</td>
                     <td>{{ equipment.get_value_of_var('Equipment', wb) }}</td>
                     <td>{{ equipment.get_value_of_var('Type', wb) }}</td>
                     <td>{{ equipment.get_filling_ratio()  }}</td>
                     <td>{{ equipment.get_filling_ratio_in_percentage() }}</td>
-                    <td data-toggle="collapse" data-target="#equipment{{ iterator.increment() }}" class="accordion-toggle"><button class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
+                    <td data-toggle="collapse" data-target="#equipment{{ iterator.increment() }}" class="accordion-toggle"><button type='button' class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
                     <td><a href="/file/{{ equipment.get_value_of_var('Hostname', wb) }}" class="btn btn-default btn-xs" role="button" target="_blank"><span class="glyphicon glyphicon-file"></span></a></td>
 
                 </tr>
@@ -47,6 +48,11 @@
                 {% endfor %}
             </tbody>
         </table>
+        <hr>
+            <button type="submit" class="btn btn-primary col-xs-12"  >Submit</button>
+
+        </form>
+
     </div>
     </div>
 {% endblock %}
