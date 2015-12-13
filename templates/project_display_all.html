@@ -43,15 +43,15 @@
                             <td>{{ p.client }}</td>
                             <td>{{ p.projectName }}</td>
                             <td>{{ p.subProjectName }}</td>
-                            <td>{{ p.excelFile }}</td>
-                            <td>{{ p.templateFile }}</td>
+                            <td><a href="/download/{{ p.id }}/{{ p.excelFile }}" class="btn btn-default btn-xs" role="button" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
+                            <td><a href="/download/{{ p.id }}/{{ p.templateFile }}" class="btn btn-default btn-xs" role="button" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a><</td>
                             <td>
-                                <a href="{{ url_for('user_update', id=p.id) }}">
+                                <a href="{{ url_for('project_update', id=p.id) }}">
                                     <i class="glyphicon glyphicon-edit"></i>
                                 </a>
                             </td>
                             <td>
-                                <a href="{{ url_for('user_delete', id=p.id) }}">
+                                <a href="{{ url_for('project_delete', id=p.id) }}">
                                     <i class="glyphicon glyphicon-remove"></i>
                                 </a>
                             </td>

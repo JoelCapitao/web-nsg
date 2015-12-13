@@ -102,8 +102,8 @@ class Project(db.Model):
 db.create_all()
 db.session.commit()
 
-def lastIDof(table):
-    return db.session.query(table).order_by(table.id.desc()).first()
+def lastIDofProject():
+    return db.session.query(Project).order_by(Project.id.desc()).first()
 
 
 def session_commit():

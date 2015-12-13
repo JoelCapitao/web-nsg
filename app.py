@@ -1,6 +1,6 @@
 import os
-from flask import render_template, request, flash, redirect, url_for, Response, session, send_file
-from model import app, User, Customer, Project, lastIDof
+from flask import render_template, request, flash, redirect, url_for, Response, session, send_file, send_from_directory
+from model import app, User, Customer, Project, lastIDofProject
 from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
 from shutil import move
@@ -33,7 +33,7 @@ def project_new():
         project = dict()
         for item in ('client', 'project_name', 'subproject_name'):
             project[item] = request.form[item]
-        for item, path in [('excel_file', 'excel_file_path'), ('template_file', 'template_file_path')]:
+        for item, path in [('excel_file', excel_file.filename), ('template_file', template_file.filename)]:
             project[item] = path
         session['data'] = project
         print(project)
@@ -62,7 +62,7 @@ def project_add():
                           project_data['template_file']
                           )
         post_add = project.add(project)
-        id_project = '3'
+        id_project = lastIDof(Project)
 
         if not post_add:
             print(project.client)
@@ -81,7 +81,7 @@ def project_add():
             for item in ('client', 'project_name', 'subproject_name'):
                 name[item] = project_data[item]
             memory_file, attachment_filename = zip_file(list_of_files, name)
-            send_file(memory_file, attachment_filename=attachment_filename, as_attachment=True)
+            #send_file(memory_file, attachment_filename=attachment_filename, as_attachment=True)
 
             return render_template('project_display_all.html', project=project)
         else:
@@ -108,6 +108,42 @@ def project_display_all():
         print(p.client)
         print(p.projectName)
     return render_template('project_display_all.html', project=project)
+
+@app.route('/project/update/<id>', methods=['GET','POST'])
+def project_update(id):
+    user = User.query.get(id)
+    if user == None:
+        flash("The user does not exist in the database")
+        return redirect(url_for('user_display_all'))
+    if request.method == 'POST':
+        user = User(request.form['firstname'],
+                    request.form['lastname'],
+                    request.form['email'],
+                    request.form['password'],
+                    request.form['quadri'],
+                  )
+        user_update = user.update(user)
+        if not user_update:
+            flash("Update was successful")
+            return redirect(url_for('user_display', id=id))
+        else:
+            error=user_update
+            flash(error)
+    return render_template('user_update.html', user=user, alert='None', message='')
+
+@app.route('/project/delete/<id>')
+def project_delete(id):
+    project = Project.query.get(id)
+    if project == None:
+        flash("This entry does not exist in the database")
+        return redirect(url_for('user_display_all'))
+    post_delete = project.delete(project)
+    if not post_delete:
+        flash("User was deleted successfully")
+    else:
+        error = post_delete
+        flash(error)
+    return redirect(url_for('project_display_all'))
 
 
 @app.route('/user')
@@ -266,6 +302,11 @@ def get_file(folder, filename):
     except IOError as exc:
         return str(exc)
 
+@app.route('/download/<id>/<filename>')
+def send_file(id, filename):
+    folder = os.path.join(app.config['UPLOAD_FOLDER'], id)
+    return send_from_directory(folder, filename, as_attachment=True)
+
 
 def zip_file(list_of_files, name):
     memory_file = BytesIO()
@@ -280,6 +321,10 @@ def zip_file(list_of_files, name):
             data.compress_type = ZIP_DEFLATED
             zf.writestr(data, file)
     return memory_file, zf_name
+
+@app.route('/test')
+def test():
+    print(str(lastIDofProject()))
 
 
 if __name__ == '__main__':
