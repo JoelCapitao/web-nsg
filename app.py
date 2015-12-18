@@ -5,7 +5,6 @@ from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
 from shutil import move
 from validationForm import ProjectForm
-from inmemoryzip import InMemoryZip
 from zip_list_of_files_in_memory import zip_file
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
@@ -16,7 +15,8 @@ def project_new():
     print(form.validate())
     if request.method == 'POST' and form.validate():
 
-        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], '{0}-{1}'.format(request.form['client'], request.form['subproject_name']))
+        _folder = '{0}-{1}'.format(request.form['client'], request.form['subproject_name'])
+        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], _folder)
         session['project_folder'] = project_folder
         os.makedirs(project_folder, exist_ok=True)
 
@@ -34,7 +34,6 @@ def project_new():
         for item, path in [('excel_file', excel_file.filename), ('template_file', template_file.filename)]:
             project[item] = path
         session['data'] = project
-        print(project)
         try:
             equipments, wb, hostnames = nsg_processing(excel_file_path, template_file_path)
         except:
@@ -42,9 +41,20 @@ def project_new():
             #TODO: Add a return page that handles this error
 
         session['hostnames'] = hostnames
+
+        data_of_equipments = list()
         for equipment in equipments:
             equipment.save_script_as(project_folder, equipment.get_value_of_var('Hostname', wb))
-        return render_template('generation_preview.html', equipments=equipments, iterator=Integer(0), wb=wb)
+            _data_of_equipment = dict()
+            for item in ('Hostname', 'Equipment', 'Type'):
+                _data_of_equipment[item] = equipment.get_value_of_var(item, wb)
+            _data_of_equipment['filling_ratio'] = equipment.get_filling_ratio()
+            _data_of_equipment['filling_ratio_in_percentage'] = equipment.get_filling_ratio_in_percentage()
+            _data_of_equipment['tb'] = equipment.tb
+            _data_of_equipment['project_folder'] = _folder
+            data_of_equipments.append(_data_of_equipment)
+
+        return render_template('generation_preview.html', equipments=data_of_equipments, iterator=Integer(1))
 
     return render_template('project.html', form=form)
 
@@ -99,6 +109,14 @@ def nsg_processing(excel_worbook, template_file):
 def project_display_all():
     project = Project.query.all()
     return render_template('project_display_all.html', project=project)
+
+@app.route('/project/display/<id>', methods=['GET','POST'])
+def project_display(id):
+    project = Project.query.get(id)
+    if project is None:
+        flash("The project does not exist in the database")
+        return redirect(url_for('project_display_all'))
+    return render_template('project_display.html', project=project, alert='None', message='')
 
 @app.route('/project/update/<id>', methods=['GET','POST'])
 def project_update(id):
