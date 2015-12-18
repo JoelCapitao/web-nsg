@@ -5,10 +5,8 @@ from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
 from shutil import move
 from validationForm import ProjectForm
-from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
-from time import localtime, time
-from flask.ext.session import Session
-from io import BytesIO
+from inmemoryzip import InMemoryZip
+from zip_list_of_files_in_memory import zip_file
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
 
@@ -65,23 +63,20 @@ def project_add():
         id_project = lastIDofProject()
 
         if not post_add:
-            print(project.client)
             new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], id_project)
             move(session['project_folder'], new_project_folder)
 
-            for hostname in session['hostnames']:
-                list_of_files = list()
-                check = request.form.get(hostname, default=False, type=bool)
-                if check:
-                    list_of_files.append(hostname + '.txt')
-            list_of_files.append(project_data['excel_file'] + '.xlsx')
-            list_of_files.append(project_data['template_file'] + '.txt')
+            if project_data['subproject_name']:
+                zf_name = "scripts-{0}-{1}-{2}.zip".format(project_data['client'], project_data['project_name'], project_data['subproject_name'])
+            else:
+                zf_name = "scripts-{0}-{1}.zip".format(project_data['client'], project_data['project_name'])
 
-            name = dict()
-            for item in ('client', 'project_name', 'subproject_name'):
-                name[item] = project_data[item]
-            memory_file, attachment_filename = zip_file(list_of_files, name)
-            #send_file(memory_file, attachment_filename=attachment_filename, as_attachment=True)
+            try:
+                zip_file(new_project_folder, os.path.join(new_project_folder, zf_name))
+            except:
+                pass
+            else:
+                return send_from_directory(new_project_folder, zf_name, as_attachment=True)
 
             return project_display_all()
         else:
@@ -103,10 +98,6 @@ def nsg_processing(excel_worbook, template_file):
 @app.route('/project')
 def project_display_all():
     project = Project.query.all()
-    for p in project:
-        print(p.id)
-        print(p.client)
-        print(p.projectName)
     return render_template('project_display_all.html', project=project)
 
 @app.route('/project/update/<id>', methods=['GET','POST'])
@@ -303,24 +294,9 @@ def get_file(folder, filename):
         return str(exc)
 
 @app.route('/download/<id>/<filename>')
-def send_file(id, filename):
+def send_file_by_id_and_filename(id, filename):
     folder = os.path.join(app.config['UPLOAD_FOLDER'], id)
     return send_from_directory(folder, filename, as_attachment=True)
-
-
-def zip_file(list_of_files, name):
-    memory_file = BytesIO()
-    if name['subproject_name']:
-        zf_name = "scripts-{0}-{1}-{2}".format(name['client'], name['project_name'], name['subproject_name'])
-    else:
-        zf_name = "scripts-{0}-{1}".format(name['client'], name['project_name'])
-    with ZipFile(memory_file, 'w') as zf:
-        for file in list_of_files:
-            data = ZipInfo(file)
-            data.date_time = localtime(time())[:6]
-            data.compress_type = ZIP_DEFLATED
-            zf.writestr(data, file)
-    return memory_file, zf_name
 
 
 if __name__ == '__main__':

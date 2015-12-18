@@ -10,7 +10,7 @@
         <table id="mytable" class="table table-bordred table-striped" cellspacing="0">
             <thead>
                 <tr>
-                    <th><input type="checkbox" id="checkall" /></th>
+                    <th><input type="checkbox" id="checkall" checked="checked"/></th>
                     <th>#</th>
                     <th>Hostname</th>
                     <th>Equipment</th>
@@ -24,7 +24,7 @@
             <tbody>
                 {% for equipment in equipments %}
                 <tr>
-                    <td><input type="checkbox" name={{ equipment.get_value_of_var('Hostname', wb) }}  class="checkthis" /></td>
+                    <td><input type="checkbox" name="{{ equipment.get_value_of_var('Hostname', wb) }}" class="checkthis" checked="checked"/></td>
                     <td>{{ iterator.value() }}</td>
                     <td>{{ equipment.get_value_of_var('Hostname', wb)  }}</td>
                     <td>{{ equipment.get_value_of_var('Equipment', wb) }}</td>
