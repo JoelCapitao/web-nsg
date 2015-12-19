@@ -52,3 +52,11 @@ $(function(){
       $('.ppc-progress-fill').css('transform','rotate('+ deg +'deg)');
       $('.ppc-percents span').html(percent+'%');
     });
+
+
+/**
+ * Go to the previous page
+ */
+function goBack() {
+    window.history.back();
+}

@@ -45,13 +45,17 @@
                             </div>
                         </div>
                     </td>
-                </tr>
+                </tr>)
                 {% endfor %}
             </tbody>
         </table>
         <hr>
-            <button type="submit" class="btn btn-primary col-xs-12"  >Submit</button>
-
+        <div class="col-md-6 col-lg-6 ">
+            <button type="button" class="btn btn-primary col-xs-12" onclick="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>Previous</button>
+        </div>
+        <div class="col-md-6 col-lg-6 ">
+            <button type="submit" class="btn btn-primary col-xs-12">Next<span class="glyphicon glyphicon-arrow-right"></span></button>
+        </div>
         </form>
 
     </div>

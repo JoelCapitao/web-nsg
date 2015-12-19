@@ -74,17 +74,14 @@ class Project(db.Model):
     client = db.Column(db.String(255), nullable=False)
     projectName = db.Column(db.String(255), nullable=False)
     subProjectName = db.Column(db.String(255), nullable=True)
-    excelFile = db.Column(db.String(255))
-    templateFile = db.Column(db.String(255))
+    version = db.relationship('ProjectVersioning', backref='project', lazy='dynamic')
     created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
 
-    def __init__(self, client, projectName, subProjectName, excelFile, templateFile):
+    def __init__(self, client, projectName, subProjectName):
         self.client = client
         self.projectName = projectName
         self.subProjectName = subProjectName
-        self.excelFile = excelFile
-        self.templateFile = templateFile
 
     def add(self, project):
         db.session.add(project)
@@ -98,6 +95,38 @@ class Project(db.Model):
         return session_commit()
 
 
+class ProjectVersioning(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    version = db.Column(db.Integer, nullable=False)
+    excelFile = db.Column(db.String(255))
+    templateFile = db.Column(db.String(255))
+    numberOfVarToFill = db.Column(db.Integer)
+    numberOfVarFilled = db.Column(db.Integer)
+    fillingRatio = db.Column(db.Integer)
+    projectId = db.Column(db.Integer, db.ForeignKey('project.id'))
+    created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
+
+    def __init__(self, version, excelFile, templateFile, numberOfVarToFill, numberOfVarFilled, project):
+        self.version = version
+        self.excelFile = excelFile
+        self.templateFile = templateFile
+        self.numberOfVarToFill = numberOfVarToFill
+        self.numberOfVarFilled = numberOfVarFilled
+        self.project = project
+
+    def add(self, projectVersioning):
+        db.session.add(projectVersioning)
+        return session_commit()
+
+    def update(self):
+        return session_commit()
+
+    def delete(self, projectVersioning):
+        db.session.delete(projectVersioning)
+        return session_commit()
+
+
 
 db.create_all()
 db.session.commit()
@@ -105,6 +134,9 @@ db.session.commit()
 def lastIDofProject():
     obj = db.session.query(Project).order_by(Project.id.desc()).first()
     return str(obj.id)
+
+def lastProject():
+    return db.session.query(Project).order_by(Project.id.desc()).first()
 
 def session_commit():
     try:

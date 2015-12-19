@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_formhelpers.html" import render_field, render_upload_file %}
 {% block title %}{{ project.projectName }} {{ project.subProjectName }}{% endblock %}
 {% block content %}
       <div class="container">
@@ -81,12 +82,37 @@
               </div>
             </div>
                  <div class="panel-footer">
-                     <a href="#" class="btn btn-primary">New version</a>
+                     <a data-toggle="collapse" data-target="#equipment1" class="accordion-toggle"><button type='button' class="btn btn-primary">New version</button></a>
                      <span class="pull-right">
                             <a href="{{ url_for('project_update', id=project.id) }}" data-original-title="Edit this project" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
                             <a href="{{ url_for('project_delete', id=project.id) }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
                         </span>
-                    </div>
+                     <div class="accordian-body collapse" id="equipment1">
+                         <div class="container">
+                            <div class="col-sm-7">
+                            <form method="POST" action="/project/upgrade/44" enctype="multipart/form-data">
+                                {{ render_upload_file(form.excel_file) }}
+                                {{ render_upload_file(form.template_file) }}
+                                <hr>
+                                <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
+                            </form>
+                                <div class="modal fade" id="processing-modal" role="dialog" aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog modal-vertical-centered">
+                                        <div class="row">
+                                                <div id="loading">
+                                                    <ul class="bokeh">
+                                                        <li></li>
+                                                        <li></li>
+                                                        <li></li>
+                                                    </ul>
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+                 </div>
           </div>
         </div>
       </div>
