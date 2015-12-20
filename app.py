@@ -226,15 +226,26 @@ def project_update(id):
 @app.route('/project/delete/<id>')
 def project_delete(id):
     project = Project.query.get(id)
+    all_versions_of_the_project = project.version.all()
     if project == None:
         flash("This entry does not exist in the database")
         return redirect(url_for('user_display_all'))
-    post_delete = project.delete(project)
-    if not post_delete:
-        flash("User was deleted successfully")
+
+    project_not_deleted = project.delete(project)
+    if not project_not_deleted:
+        flash("Project was deleted successfully")
     else:
-        error = post_delete
+        error = project_not_deleted
         flash(error)
+
+    for _version in all_versions_of_the_project:
+        version_not_deleted = _version.delete(_version)
+        if not version_not_deleted:
+            flash("Project version was deleted successfully")
+        else:
+            error = project_not_deleted
+            flash(error)
+
     return redirect(url_for('project_display_all'))
 
 
