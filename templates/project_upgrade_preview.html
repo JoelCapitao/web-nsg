@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Preview{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="col-sm-10">
+            <div class="row">
+                <h2>Preview</h2>
+            </div>
+                <form method="POST" action="/project/{{ id }}/upgrade" enctype="multipart/form-data">
+                <table id="mytable" class="table table-bordred table-striped" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>#</th>
+                            <th>Hostname</th>
+                            <th>Equipment</th>
+                            <th>Type</th>
+                            <th>Filling ratio</th>
+                            <th>Percentage</th>
+                            <th>Error</th>
+                            <th>Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for equipment in equipments %}
+                        <tr>
+                            <td><a href="/file/{{ equipment['Hostname'] }}" class="btn btn-default btn-xs" role="button" target="_blank"><span class="glyphicon glyphicon-file"></span></a></td>
+                            <td>{{ iterator.value() }}</td>
+                            <td>{{ equipment['Hostname']  }}</td>
+                            <td>{{ equipment['Equipment'] }}</td>
+                            <td>{{ equipment['Type'] }}</td>
+                            <td>{{ equipment['filling_ratio']  }}</td>
+                            <td>{{ equipment['filling_ratio_in_perentage'] }}</td>
+                            <td data-toggle="collapse" data-target="#equipment{{ iterator.increment() }}" class="accordion-toggle"><button type='button' class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
+                            <td><a href="/download/{{ equipment['project_folder'] }}/{{ equipment['Hostname']  }}.txt" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="12" class="hiddenRow">
+                                <div class="accordian-body collapse" id="equipment{{ iterator.value() }}">
+                                    <div class="col-sm-12">
+                                        {% for error in equipment['tb'] %}
+                                        <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>)
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <hr>
+                <div class="col-md-6 col-lg-6 ">
+                    <button type="button" class="btn btn-primary col-xs-12" onclick="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>Previous</button>
+                </div>
+                <div class="col-md-6 col-lg-6 ">
+                    <button type="submit" class="btn btn-primary col-xs-12">Next<span class="glyphicon glyphicon-arrow-right"></span></button>
+                </div>
+                </form>
+
+        </div>
+    </div>
+{% endblock %}

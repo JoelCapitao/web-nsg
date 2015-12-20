@@ -86,7 +86,7 @@
                      <div class="accordian-body collapse" id="equipment1">
                          <div class="container">
                             <div class="col-sm-7">
-                            <form method="POST" action="/project/upgrade/{{ project.id }}" enctype="multipart/form-data">
+                            <form method="POST" action="/project/{{ project.id }}/new" enctype="multipart/form-data">
                                 {{ render_upload_file(form.excel_file) }}
                                 {{ render_upload_file(form.template_file) }}
                                 <hr>

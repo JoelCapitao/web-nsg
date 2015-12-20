@@ -28,3 +28,6 @@ class ProjectForm(Form):
     excel_file = FileField(u'Excel Workbook', validators=[check_templatefile])
     template_file = FileField(u'Template File', validators=[check_excelfile])
 
+class NewProjectVersionForm(Form):
+    excel_file = FileField(u'Excel Workbook', validators=[check_templatefile])
+    template_file = FileField(u'Template File', validators=[check_excelfile])

@@ -131,12 +131,18 @@ class ProjectVersioning(db.Model):
 db.create_all()
 db.session.commit()
 
-def lastIDofProject():
+
+def last_project():
+    return db.session.query(Project).order_by(Project.id.desc()).first()
+
+def last_id_of_the_table_project():
     obj = db.session.query(Project).order_by(Project.id.desc()).first()
     return str(obj.id)
 
-def lastProject():
-    return db.session.query(Project).order_by(Project.id.desc()).first()
+def last_version_of_the_project_id_equal_to(id):
+    project = Project.query.get(id)
+    list_all_versions_of_the_project = project.version.all()
+    return list_all_versions_of_the_project[-1]
 
 def session_commit():
     try:
