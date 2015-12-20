@@ -1,11 +1,7 @@
 {% extends "base.html" %}
 {% from "_formhelpers.html" import render_field, render_upload_file %}
-{% block title %}{{ project.projectName }} {{ project.subProjectName }}{% endblock %}
+{% block title %}{{ project.client }} - {{ project.projectName }}{% endblock %}
 {% block content %}
-      <div class="container">
-        <div class="row">
-        <h2>{{ project.projectName }} {{ project.subProjectName }}</h2>
-    </div>
     <div class="row margin-10">
     <div class="col-md-5">
         <div class="alert alert-danger" style="display : {{ alert }}">
@@ -19,12 +15,12 @@
         <div class="col-md-9 col-lg-10 " >
           <div class="panel panel-info">
             <div class="panel-heading">
-              <h3 class="panel-title">{{ project.projectName }} {{ project.subProjectName }}</h3>
+              <h3 class="panel-title">{{ project.client }} - {{ project.projectName }}</h3>
             </div>
             <div class="panel-body">
               <div class="row">
                   <div class=" col-md-6 col-lg-4 ">
-                      <div class="progress-pie-chart" data-percent="67"><!--Pie Chart -->
+                      <div class="progress-pie-chart" data-percent="{{ project.fillingRatio }}"><!--Pie Chart -->
                         <div class="ppc-progress">
                             <div class="ppc-progress-fill"></div>
                         </div>
@@ -66,15 +62,15 @@
                     <tbody>
                       <tr>
                         <td>Filling Ratio</td>
-                        <td>{{ project.client }}</td>
+                        <td>{{ project.fillingRatio }}</td>
                       </tr>
                       <tr>
                         <td>Number of variables filled</td>
-                        <td>{{ project.projectName }}</td>
+                        <td>{{ project.numberOfVarFilled }}</td>
                       </tr>
                       <tr>
                         <td>Current Version</td>
-                        <td>{{ project.subProjectName }}</td>
+                        <td>{{ project.currentVersion }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -90,7 +86,7 @@
                      <div class="accordian-body collapse" id="equipment1">
                          <div class="container">
                             <div class="col-sm-7">
-                            <form method="POST" action="/project/upgrade/44" enctype="multipart/form-data">
+                            <form method="POST" action="/project/upgrade/{{ project.id }}" enctype="multipart/form-data">
                                 {{ render_upload_file(form.excel_file) }}
                                 {{ render_upload_file(form.template_file) }}
                                 <hr>

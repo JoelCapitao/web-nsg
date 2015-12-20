@@ -86,8 +86,8 @@ def project_add():
 
         project_versioning = project_versioning.add(project_versioning)
 
-        if not post_add and project_versioning:
-            new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], project.id)
+        if not post_add and not project_versioning:
+            new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(project.id))
             move(session['project_folder'], new_project_folder)
 
             if project_data['subproject_name']:
@@ -102,11 +102,11 @@ def project_add():
             else:
                 return send_from_directory(new_project_folder, zf_name, as_attachment=True)
 
-            return project_display_all()
+            return redirect(url_for('project_display_all'))
         else:
             error = post_add
             flash(error)
-    return render_template('project.html')
+    return redirect(url_for('project_display_all'))
 
 
 def nsg_processing(excel_worbook, template_file):
@@ -122,18 +122,31 @@ def nsg_processing(excel_worbook, template_file):
 @app.route('/project')
 def project_display_all():
     projects = Project.query.all()
-    for p in projects:
-        _all_version_of_the_project = p.version.all()
+    for _project in projects:
+        _all_version_of_the_project = _project.version.all()
         if _all_version_of_the_project:
             last_version = _all_version_of_the_project[-1]
             for item in ('excelFile', 'templateFile'):
-                setattr(p, item, getattr(last_version, item))
+                setattr(_project, item, getattr(last_version, item))
 
     return render_template('project_display_all.html', project=projects)
 
 @app.route('/project/display/<id>', methods=['GET','POST'])
 def project_display(id):
     project = Project.query.get(id)
+    all_version_of_the_project = project.version.all()
+    last_version_of_the_project = all_version_of_the_project[-1]
+    for item in ('excelFile', 'templateFile', 'numberOfVarToFill', 'numberOfVarFilled'):
+        setattr(project, item, getattr(last_version_of_the_project, item))
+    # The attribute 'version' is not in the loop because the object does not accept an attr with that name
+    # So I replace 'version' by 'current_version'
+    setattr(project, 'currentVersion', getattr(last_version_of_the_project, 'version'))
+    _fillingRatio = '{:.0%}'.format(int(last_version_of_the_project.numberOfVarFilled)/ \
+                                    (int(last_version_of_the_project.numberOfVarToFill) +
+                                     int(last_version_of_the_project.numberOfVarFilled))
+                                    )
+    setattr(project, 'fillingRatio', _fillingRatio)
+
 
     if project is None:
         flash("The project does not exist in the database")
