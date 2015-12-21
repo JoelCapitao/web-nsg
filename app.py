@@ -257,6 +257,24 @@ def project_update(id):
             flash(error)
     return render_template('user_update.html', user=user, alert='None', message='')
 
+
+@app.route('/project/delete/version/<id>')
+def project_delete_version(id):
+    project_versioning = ProjectVersioning.query.get(id)
+
+    if project_versioning == None:
+        flash("This entry does not exist in the database")
+        return redirect(url_for('user_display_all'))
+
+    error_when_deleting_project_version = project_versioning.delete(project_versioning)
+    if not error_when_deleting_project_version:
+        flash("Project version was deleted successfully")
+    else:
+        flash(error_when_deleting_project_version)
+
+    return redirect(url_for('project_display', id=project_versioning.projectId))
+
+
 @app.route('/project/delete/<id>')
 def project_delete(id):
     project = Project.query.get(id)

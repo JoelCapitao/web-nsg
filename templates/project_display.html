@@ -108,7 +108,7 @@
                                         <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.excelFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
                                         <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.templateFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
                                         <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/zipFile" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
-                                        <th><a href=""  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a></th>
+                                        <th><a href="/project/delete/version/{{ version.id }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a></th>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
