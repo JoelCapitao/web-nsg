@@ -6,6 +6,7 @@ from werkzeug import secure_filename
 from shutil import move
 from validationForm import ProjectForm, NewProjectVersionForm
 from zip_list_of_files_in_memory import zip_file
+from fnmatch import fnmatch
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
 
@@ -87,7 +88,7 @@ def project_add():
         project_versioning = project_versioning.add(project_versioning)
 
         if not post_add and not project_versioning:
-            new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(project.id))
+            new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(project.id), 'v1')
             move(session['project_folder'], new_project_folder)
 
             if project_data['subproject_name']:
@@ -99,10 +100,8 @@ def project_add():
                 zip_file(new_project_folder, os.path.join(new_project_folder, zf_name))
             except:
                 pass
-            else:
-                return send_from_directory(new_project_folder, zf_name, as_attachment=True)
 
-            return redirect(url_for('project_display_all'))
+            return redirect(url_for('project_display', id=last_id_of_the_table_project()))
         else:
             error = post_add
             flash(error)
@@ -148,7 +147,8 @@ def project_display(id):
         setattr(project, 'fillingRatio', _fillingRatio)
 
         form = ProjectForm(request.form)
-        return render_template('project_display.html', project=project, form=form, alert='None', message='')
+        return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
+                               form=form, alert='None', message='')
     else:
         flash("The project does not exist in the database")
         return redirect(url_for('project_display_all'))
@@ -228,8 +228,6 @@ def project_upgrade(id):
                 zip_file(data['project_folder'], os.path.join(data['project_folder'], zf_name))
             except:
                 pass
-            else:
-                return send_from_directory(data['project_folder'], zf_name, as_attachment=True)
 
             return redirect(url_for('project_display', id=id))
         else:
@@ -441,10 +439,18 @@ def get_file(folder, filename):
     except IOError as exc:
         return str(exc)
 
-@app.route('/download/<id>/<filename>')
-def send_file_by_id_and_filename(id, filename):
-    folder = os.path.join(app.config['UPLOAD_FOLDER'], id)
+@app.route('/download/<id>/<version>/<filename>')
+def send_file_by_id_and_filename(id, version, filename):
+    folder = os.path.join(app.config['UPLOAD_FOLDER'], id, 'v{0}'.format(version))
     return send_from_directory(folder, filename, as_attachment=True)
+
+
+@app.route('/download/<id>/<version>/zipFile')
+def send_zip_file_by_id_equal_to(id, version):
+    project_folder = os.path.join(app.config['UPLOAD_FOLDER'], id, 'v{0}'.format(version))
+    for _file in os.listdir(project_folder):
+        if fnmatch(_file, '*.zip'):
+            return send_from_directory(project_folder, _file, as_attachment=True)
 
 
 if __name__ == '__main__':

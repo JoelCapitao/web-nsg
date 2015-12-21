@@ -3,115 +3,154 @@
 {% block title %}{{ project.client }} - {{ project.projectName }}{% endblock %}
 {% block content %}
     <div class="row margin-10">
-    <div class="col-md-5">
-        <div class="alert alert-danger" style="display : {{ alert }}">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
-                ×</button>
-           <span class="glyphicon glyphicon-hand-right"></span> <strong>{{ message }}</strong>
+        <div class="col-md-5">
+            <div class="alert alert-danger" style="display : {{ alert }}">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                    ×</button>
+               <span class="glyphicon glyphicon-hand-right"></span> <strong>{{ message }}</strong>
+            </div>
         </div>
-    </div>
-    </div>
-      <div class="row">
-        <div class="col-md-9 col-lg-10 " >
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              <h3 class="panel-title">{{ project.client }} - {{ project.projectName }}</h3>
-            </div>
-            <div class="panel-body">
-              <div class="row">
-                  <div class=" col-md-6 col-lg-4 ">
-                      <div class="progress-pie-chart" data-percent="{{ project.fillingRatio }}"><!--Pie Chart -->
-                        <div class="ppc-progress">
-                            <div class="ppc-progress-fill"></div>
-                        </div>
-                        <div class="ppc-percents">
-                        <div class="pcc-percents-wrapper">
-                            <span>%</span>
-                        </div>
-                        </div>
-                    </div><!--End Chart -->
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-lg-12 " >
+              <div class="panel panel-info">
+                <div class="panel-heading">
+                  <h3 class="panel-title">{{ project.client }} - {{ project.projectName }}</h3>
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                      <div class=" col-md-6 col-lg-4 ">
+                          <div class="progress-pie-chart" data-percent="{{ project.fillingRatio }}"><!--Pie Chart -->
+                            <div class="ppc-progress">
+                                <div class="ppc-progress-fill"></div>
+                            </div>
+                            <div class="ppc-percents">
+                            <div class="pcc-percents-wrapper">
+                                <span>%</span>
+                            </div>
+                            </div>
+                        </div><!--End Chart -->
+                      </div>
+                    <div class=" col-md-6 col-lg-4 ">
+                      <table class="table table-user-information">
+                        <tbody>
+                          <tr>
+                            <td>Client</td>
+                            <td>{{ project.client }}</td>
+                          </tr>
+                          <tr>
+                            <td>Project Name</td>
+                            <td>{{ project.projectName }}</td>
+                          </tr>
+                          <tr>
+                            <td>Subproject Name</td>
+                            <td>{{ project.subProjectName }}</td>
+                          </tr>
+                          <tr>
+                            <td>Excel File</td>
+                            <td><{{ project.excelFile }}</td>
+                          </tr>
+                          <tr>
+                            <td>Template File</td>
+                            <td>{{ project.templateFile }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                      <div class=" col-md-6 col-lg-4 ">
+                          <table class="table table-user-information">
+                        <tbody>
+                          <tr>
+                            <td>Filling Ratio</td>
+                            <td>{{ project.fillingRatio }}</td>
+                          </tr>
+                          <tr>
+                            <td>Number of variables filled</td>
+                            <td>{{ project.numberOfVarFilled }}</td>
+                          </tr>
+                          <tr>
+                            <td>Current Version</td>
+                            <td>{{ project.currentVersion }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                          <div class="col-md-9 col-md-offset-5">
+                              <div class="row">
+                                  <a href="/download/{{ project.id }}/{{ project.currentVersion }}/zipFile"><i class="fa fa-download fa-5x" ></i></a>
+                              </div>
+                          </div>
+                      </div>
                   </div>
-                <div class=" col-md-6 col-lg-4 ">
-                  <table class="table table-user-information">
-                    <tbody>
-                      <tr>
-                        <td>Client</td>
-                        <td>{{ project.client }}</td>
-                      </tr>
-                      <tr>
-                        <td>Project Name</td>
-                        <td>{{ project.projectName }}</td>
-                      </tr>
-                      <tr>
-                        <td>Subproject Name</td>
-                        <td>{{ project.subProjectName }}</td>
-                      </tr>
-                      <tr>
-                        <td>Excel File</td>
-                        <td><{{ project.excelFile }}</td>
-                      </tr>
-                      <tr>
-                        <td>Template File</td>
-                        <td>{{ project.templateFile }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                  <div class=" col-md-6 col-lg-4 ">
-                  <table class="table table-user-information">
-                    <tbody>
-                      <tr>
-                        <td>Filling Ratio</td>
-                        <td>{{ project.fillingRatio }}</td>
-                      </tr>
-                      <tr>
-                        <td>Number of variables filled</td>
-                        <td>{{ project.numberOfVarFilled }}</td>
-                      </tr>
-                      <tr>
-                        <td>Current Version</td>
-                        <td>{{ project.currentVersion }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-                 <div class="panel-footer">
-                     <a data-toggle="collapse" data-target="#equipment1" class="accordion-toggle"><button type='button' class="btn btn-primary">New version</button></a>
-                     <span class="pull-right">
-                            <a href="{{ url_for('project_update', id=project.id) }}" data-original-title="Edit this project" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
-                            <a href="{{ url_for('project_delete', id=project.id) }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
-                        </span>
-                     <div class="accordian-body collapse" id="equipment1">
-                         <div class="container">
-                            <div class="col-sm-7">
-                            <form method="POST" action="/project/{{ project.id }}/new" enctype="multipart/form-data">
-                                {{ render_upload_file(form.excel_file) }}
-                                {{ render_upload_file(form.template_file) }}
-                                <hr>
-                                <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
-                            </form>
-                                <div class="modal fade" id="processing-modal" role="dialog" aria-labelledby="myModalLabel">
-                                    <div class="modal-dialog modal-vertical-centered">
-                                        <div class="row">
-                                                <div id="loading">
-                                                    <ul class="bokeh">
-                                                        <li></li>
-                                                        <li></li>
-                                                        <li></li>
-                                                    </ul>
-                                                </div>
+                  <div class="row">
+                      <div class="col-md-12 col-lg-12 " >
+                          <div class="panel panel-warning">
+                            <div class="panel-heading">
+                              <h3 class="panel-title">Old versions</h3>
+                            </div>
+                            <table id="mytable" class="table table-bordred table-striped" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Version</th>
+                                        <th>Filling ratio</th>
+                                        <th>Percentage</th>
+                                        <th>Excel File</th>
+                                        <th>Template File</th>
+                                        <th>Zip File</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for version in versions %}
+                                    <tr>
+                                        <td>{{ version.version }}</td>
+                                        <td>{{ version.numberOfVarFilled }}/{{ version.numberOfVarToFill  }}</td>
+                                        <td>{{ version.fillingRatio }}</td>
+                                        <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.excelFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
+                                        <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.templateFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
+                                        <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/zipFile" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
+                                        <th><a href=""  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a></th>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                          </div>
+                        </div>
+                    </div>
+                     <div class="panel-footer">
+                         <a data-toggle="collapse" data-target="#equipment1" class="accordion-toggle"><button type='button' class="btn btn-primary">New version</button></a>
+                         <span class="pull-right">
+                                <a href="{{ url_for('project_update', id=project.id) }}" data-original-title="Edit this project" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
+                                <a href="{{ url_for('project_delete', id=project.id) }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
+                         </span>
+                         <div class="accordian-body collapse" id="equipment1">
+                             <div class="container">
+                                <div class="col-sm-7">
+                                <form method="POST" action="/project/{{ project.id }}/new" enctype="multipart/form-data">
+                                    {{ render_upload_file(form.excel_file) }}
+                                    {{ render_upload_file(form.template_file) }}
+                                    <hr>
+                                    <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
+                                </form>
+                                    <div class="modal fade" id="processing-modal" role="dialog" aria-labelledby="myModalLabel">
+                                        <div class="modal-dialog modal-vertical-centered">
+                                            <div class="row">
+                                                    <div id="loading">
+                                                        <ul class="bokeh">
+                                                            <li></li>
+                                                            <li></li>
+                                                            <li></li>
+                                                        </ul>
+                                                    </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                         </div>
                      </div>
-                 </div>
-          </div>
+              </div>
+            </div>
         </div>
-      </div>
-  </div>
+    </div>
 
 {% endblock %}
