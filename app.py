@@ -7,6 +7,7 @@ from shutil import move
 from validationForm import ProjectForm, NewProjectVersionForm
 from zip_list_of_files_in_memory import zip_file
 from fnmatch import fnmatch
+import pickle
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
 
@@ -15,7 +16,7 @@ def project_new():
     form = ProjectForm(request.form)
     if request.method == 'POST' and form.validate():
 
-        _folder = '{0}-{1}'.format(request.form['client'], request.form['subproject_name'])
+        _folder = '{0}-{1}'.format(request.form['client'], request.form['project_name'])
         project_folder = os.path.join(app.config['UPLOAD_FOLDER'], _folder)
         session['project_folder'] = project_folder
         os.makedirs(project_folder, exist_ok=True)
@@ -28,37 +29,42 @@ def project_new():
         template_file_path = os.path.join(project_folder, secure_filename(template_file.filename))
         template_file.save(template_file_path)
 
-        project = dict()
+        project_data = dict()
         for item in ('client', 'project_name', 'subproject_name'):
-            project[item] = request.form[item]
+            project_data[item] = request.form[item]
+        session['project_data'] = project_data
+
+        versioning_data = {'to_fill': 0, 'filled': 0}
         for item, path in [('excel_file', excel_file.filename), ('template_file', template_file.filename)]:
-            project[item] = path
-        session['data'] = project
+            versioning_data[item] = path
         try:
             equipments, wb, hostnames = nsg_processing(excel_file_path, template_file_path)
         except:
             exit()
             #TODO: Add a return page that handles this error
 
-        session['hostnames'] = hostnames
 
         data_of_equipments = list()
-
-        total_of_var = {'to_fill': 0, 'filled': 0}
         for equipment in equipments:
             equipment.save_script_as(project_folder, equipment.get_value_of_var('Hostname', wb))
-            total_of_var['to_fill'] += equipment.get_resolved_var() + equipment.get_unresolved_var()
-            total_of_var['filled'] += equipment.get_resolved_var()
+
+            versioning_data['to_fill'] += equipment.get_nbr_of_var_to_fill_in()
+            versioning_data['filled'] += equipment.get_resolved_var()
+
             _data_of_equipment = dict()
-            for item in ('Hostname', 'Equipment', 'Type'):
-                _data_of_equipment[item] = equipment.get_value_of_var(item, wb)
+            for param in ('Hostname', 'Equipment', 'Type'):
+                _data_of_equipment[param] = wb['Global'].get_value_of_var_by_index_and_param(equipment.hostname, param)
             _data_of_equipment['filling_ratio'] = equipment.get_filling_ratio()
             _data_of_equipment['filling_ratio_in_percentage'] = equipment.get_filling_ratio_in_percentage()
             _data_of_equipment['tb'] = equipment.tb
             _data_of_equipment['project_folder'] = _folder
             data_of_equipments.append(_data_of_equipment)
 
-        session['total_of_var'] = total_of_var
+        versioning_data['fillingRatio'] = '{:.0%}'.format(versioning_data['filled']/versioning_data['to_fill'])
+        session['versioning_data'] = versioning_data
+
+        with open(os.path.join(project_folder, 'data.pickle'), 'wb') as f:
+            pickle.dump(data_of_equipments, f, 0)
 
         return render_template('generation_preview.html', equipments=data_of_equipments, iterator=Integer(1))
 
@@ -68,23 +74,21 @@ def project_new():
 @app.route('/project/add', methods=['GET','POST'])
 def project_add():
     if request.method == 'POST':
-        project_data = session.get('data')
+        project_data = session.get('project_data')
+        versioning_data = session.get('versioning_data')
+
         project = Project(project_data['client'],
                           project_data['project_name'],
-                          project_data['subproject_name'],
-                          )
+                          project_data['subproject_name'])
         post_add = project.add(project)
         project = last_project()
-
-        total_of_var = session.get('total_of_var')
         project_versioning = ProjectVersioning(1,
-                                               project_data['excel_file'],
-                                               project_data['template_file'],
-                                               total_of_var['to_fill'],
-                                               total_of_var['filled'],
-                                               project
-                                               )
-
+                                               versioning_data['excel_file'],
+                                               versioning_data['template_file'],
+                                               versioning_data['to_fill'],
+                                               versioning_data['filled'],
+                                               versioning_data['fillingRatio'],
+                                               project)
         project_versioning = project_versioning.add(project_versioning)
 
         if not post_add and not project_versioning:
@@ -92,9 +96,9 @@ def project_add():
             move(session['project_folder'], new_project_folder)
 
             if project_data['subproject_name']:
-                zf_name = "scripts-{0}-{1}-{2}.zip".format(project_data['client'], project_data['project_name'], project_data['subproject_name'])
+                zf_name = "scripts-{0}-{1}-{2}-v1.zip".format(project_data['client'], project_data['project_name'], project_data['subproject_name'])
             else:
-                zf_name = "scripts-{0}-{1}.zip".format(project_data['client'], project_data['project_name'])
+                zf_name = "scripts-{0}-{1}-v1.zip".format(project_data['client'], project_data['project_name'])
 
             try:
                 zip_file(new_project_folder, os.path.join(new_project_folder, zf_name))
@@ -136,19 +140,19 @@ def project_display(id):
     if project:
         all_version_of_the_project = project.version.all()
         last_version_of_the_project = all_version_of_the_project[-1]
-        for item in ('excelFile', 'templateFile', 'numberOfVarToFill', 'numberOfVarFilled'):
+        for item in ('excelFile', 'templateFile', 'numberOfVarToFill', 'numberOfVarFilled', 'fillingRatio'):
             setattr(project, item, getattr(last_version_of_the_project, item))
         # The attribute 'version' is not in the loop because the object does not accept an attr with that name
         # So I replace 'version' by 'current_version'
         setattr(project, 'currentVersion', getattr(last_version_of_the_project, 'version'))
-        _fillingRatio = '{:.0%}'.format(int(last_version_of_the_project.numberOfVarFilled)/ \
-                                        (int(last_version_of_the_project.numberOfVarToFill) +
-                                         int(last_version_of_the_project.numberOfVarFilled)))
-        setattr(project, 'fillingRatio', _fillingRatio)
+
+        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], id, 'v{0}'.format(last_version_of_the_project.version))
+        with open(os.path.join(project_folder, 'data.pickle'), 'rb') as f:
+            equipments = pickle.load(f)
 
         form = ProjectForm(request.form)
         return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
-                               form=form, alert='None', message='')
+                               form=form, alert='None', message='', equipments=equipments, iterator=Integer(1))
     else:
         flash("The project does not exist in the database")
         return redirect(url_for('project_display_all'))
@@ -173,18 +177,26 @@ def project_new_version(id):
         template_file_path = os.path.join(new_project_folder, secure_filename(template_file.filename))
         template_file.save(template_file_path)
 
-        data = dict()
+        versioning_data = {'to_fill': 0, 'filled': 0}
+        print('---------------->{0}----{1}'.format(excel_file.filename, template_file.filename))
         for _file, _path in [('excel_file', excel_file.filename), ('template_file', template_file.filename)]:
-            data[_file] = _path
+            versioning_data[_file] = _path
+            print(_path)
+
         try:
             equipments, wb, hostnames = nsg_processing(excel_file_path, template_file_path)
         except:
             exit()
             #TODO: Add a return page that handles this error
 
+
         data_of_equipments = list()
         for equipment in equipments:
             equipment.save_script_as(new_project_folder, equipment.get_value_of_var('Hostname', wb))
+
+            versioning_data['to_fill'] += equipment.get_nbr_of_var_to_fill_in()
+            versioning_data['filled'] += equipment.get_resolved_var()
+
             _data_of_equipment = dict()
             for _item in ('Hostname', 'Equipment', 'Type'):
                 _data_of_equipment[_item] = equipment.get_value_of_var(_item, wb)
@@ -193,8 +205,12 @@ def project_new_version(id):
             _data_of_equipment['tb'] = equipment.tb
             data_of_equipments.append(_data_of_equipment)
 
-        data['project_folder'] = new_project_folder
-        session['data'] = data
+            with open(os.path.join(new_project_folder, 'data.pickle'), 'wb') as f:
+                pickle.dump(data_of_equipments, f, 0)
+
+        versioning_data['fillingRatio'] = '{:.0%}'.format(versioning_data['filled']/versioning_data['to_fill'])
+        versioning_data['project_folder'] = new_project_folder
+        session['versioning_data'] = versioning_data
 
         return render_template('project_upgrade_preview.html', id=project.id,
                                equipments=data_of_equipments, iterator=Integer(1))
@@ -205,27 +221,33 @@ def project_new_version(id):
 @app.route('/project/<id>/upgrade', methods=['GET','POST'])
 def project_upgrade(id):
     if request.method == 'POST':
-        data = session.get('data')
+        versioning_data = session.get('versioning_data')
+        print('-------------------------------->%s' % versioning_data)
         project = Project.query.get(id)
         last_version_of_the_project = last_version_of_the_project_id_equal_to(id)
 
-        total_of_var = session.get('total_of_var')
         new_version = ProjectVersioning(last_version_of_the_project.version + 1,
-                                               data['excel_file'],
-                                               data['template_file'],
-                                               total_of_var['to_fill'],
-                                               total_of_var['filled'],
-                                               project)
+                                        versioning_data['excel_file'],
+                                        versioning_data['template_file'],
+                                        versioning_data['to_fill'],
+                                        versioning_data['filled'],
+                                        versioning_data['fillingRatio'],
+                                        project)
         error_in_creation_of_new_version = new_version.add(new_version)
 
         if not error_in_creation_of_new_version:
             if project.subProjectName:
-                zf_name = "scripts-{0}-{1}-{2}.zip".format(project.client, project.projectName, project.subProjectName)
+                zf_name = "scripts-{0}-{1}-{2}-v{3}.zip".format(project.client,
+                                                                project.projectName,
+                                                                project.subProjectName,
+                                                                last_version_of_the_project.version + 1)
             else:
-                zf_name = "scripts-{0}-{1}.zip".format(project.client, project.projectName)
+                zf_name = "scripts-{0}-{1}-v{2}.zip".format(project.client,
+                                                            project.projectName,
+                                                            last_version_of_the_project.version + 1)
 
             try:
-                zip_file(data['project_folder'], os.path.join(data['project_folder'], zf_name))
+                zip_file(versioning_data['project_folder'], os.path.join(versioning_data['project_folder'], zf_name))
             except:
                 pass
 
@@ -450,6 +472,12 @@ def return_file(filename):
     file = get_file(folder, filename + '.txt')
     return Response(file, mimetype="text/plain")
 
+@app.route('/file/<id>/<version>/<filename>')
+def return_file_by_id_and_version(id, version, filename):
+    folder = os.path.join(app.config['UPLOAD_FOLDER'], id, 'v{0}'.format(version))
+    file = get_file(folder, filename + '.txt')
+    return Response(file, mimetype="text/plain")
+
 def get_file(folder, filename):
     try:
         file = os.path.join(folder, filename)
@@ -472,4 +500,4 @@ def send_zip_file_by_id_equal_to(id, version):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5005)
+    app.run(host="0.0.0.0", port=5000)
