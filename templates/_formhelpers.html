@@ -1,5 +1,5 @@
 {% macro render_field(field) %}
-    <div class="form-group" {% if field.errors %}has-error{% endif %}>
+    <div class="form-group {% if field.errors %}has-error{% endif %}">
             <label for="user">{{ field.label }}</label>
             <div class="input-group">
                 {{ field(class="form-control", **kwargs)|safe }}
@@ -7,14 +7,14 @@
             </div>
             {% if field.errors %}
             {% for e in field.errors %}
-                <p class="help-block">{{ e }}</p>
+                <p class="text-danger">{{ e }}</p>
             {% endfor %}
         {% endif %}
     </div>
 {% endmacro %}
 
 {% macro render_upload_file(field) %}
-    <div class="form-group">
+    <div class="form-group {% if field.errors %}has-error{% endif %}">
             <label for="user">{{ field.label }}</label>
             <div class="input-group">
                 {{ field(class="form-control", **kwargs) }}
@@ -22,8 +22,9 @@
             </div>
             {% if field.errors %}
             {% for e in field.errors %}
-                <p class="help-block">{{ e }}</p>
+                <p class="text-danger">{{ e }}</p>
             {% endfor %}
         {% endif %}
     </div>
 {% endmacro %}
+

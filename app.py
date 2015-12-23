@@ -4,7 +4,7 @@ from model import *
 from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
 from shutil import move
-from validationForm import ProjectForm, NewProjectVersionForm
+from validationForm import ProjectForm, NewProjectVersionForm, ProjectUpdateForm
 from zip_list_of_files_in_memory import zip_file
 from fnmatch import fnmatch
 import pickle
@@ -81,6 +81,7 @@ def project_add():
                           project_data['project_name'],
                           project_data['subproject_name'])
         post_add = project.add(project)
+
         project = last_project()
         project_versioning = ProjectVersioning(1,
                                                versioning_data['excel_file'],
@@ -178,7 +179,6 @@ def project_new_version(id):
         template_file.save(template_file_path)
 
         versioning_data = {'to_fill': 0, 'filled': 0}
-        print('---------------->{0}----{1}'.format(excel_file.filename, template_file.filename))
         for _file, _path in [('excel_file', excel_file.filename), ('template_file', template_file.filename)]:
             versioning_data[_file] = _path
             print(_path)
@@ -222,7 +222,6 @@ def project_new_version(id):
 def project_upgrade(id):
     if request.method == 'POST':
         versioning_data = session.get('versioning_data')
-        print('-------------------------------->%s' % versioning_data)
         project = Project.query.get(id)
         last_version_of_the_project = last_version_of_the_project_id_equal_to(id)
 
@@ -257,27 +256,34 @@ def project_upgrade(id):
     return redirect(url_for('project_display_all'))
 
 
-@app.route('/project/update/<id>', methods=['GET','POST'])
+@app.route('/project/<id>/update', methods=['GET','POST'])
 def project_update(id):
-    user = User.query.get(id)
-    if user == None:
-        flash("The user does not exist in the database")
-        return redirect(url_for('user_display_all'))
-    if request.method == 'POST':
-        user = User(request.form['firstname'],
-                    request.form['lastname'],
-                    request.form['email'],
-                    request.form['password'],
-                    request.form['quadri'],
-                  )
-        user_update = user.update(user)
-        if not user_update:
+    form = ProjectUpdateForm(request.form)
+    project = Project.query.get(id)
+    if project == None:
+        flash("The project does not exist in the database")
+        return render_template('project_update.html', form=form)
+
+    if request.method == 'POST' and form.validate():
+        project_updated = Project(request.form['client'],
+                                  request.form['project_name'],
+                                  request.form['subproject_name'])
+
+        column = dict()
+        for column_name, form_value in [('client', 'client'),
+                                        ('projectName', 'project_name'),
+                                        ('subProjectName', 'subproject_name')]:
+            column[column_name] = request.form[form_value]
+        error_occurred_while_updating = project_updated.update(project, column)
+        if not error_occurred_while_updating:
             flash("Update was successful")
-            return redirect(url_for('user_display', id=id))
         else:
-            error = user_update
-            flash(error)
-    return render_template('user_update.html', user=user, alert='None', message='')
+            flash(error_occurred_while_updating)
+            render_template('project_update.html', form=form, project=project)
+
+        return redirect(url_for('project_display', id=id))
+
+    return render_template('project_update.html', form=form, project=project)
 
 
 @app.route('/project/delete/version/<id>')

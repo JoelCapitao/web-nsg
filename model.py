@@ -87,7 +87,9 @@ class Project(db.Model):
         db.session.add(project)
         return session_commit()
 
-    def update(self):
+    def update(self, project, columns):
+        for column_name, value in columns.items():
+            setattr(project, column_name, value)
         return session_commit()
 
     def delete(self, project):

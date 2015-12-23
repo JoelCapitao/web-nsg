@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Editing Project{% endblock %}
+{% from "_formhelpers.html" import render_field %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h2>Editing {{ project.client }} - {{ project.projectName }}</h2>
+        </div>
+    </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="row margin-10">
+                <div class="col-md-5">
+                    <div class="alert alert-danger" style="display : block">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        {% for message in messages %}
+                            <span class="glyphicon glyphicon-hand-right"></span> <strong>{{ message }}</strong>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+        <div class="container">
+            <div class="col-sm-7">
+                <form method="POST" action="{{ url_for('project_update', id=project.id) }}" enctype="multipart/form-data">
+                    {{ render_field(form.client) }}
+                    {{ render_field(form.project_name) }}
+                    {{ render_field(form.subproject_name) }}
+                    <hr>
+                    <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
+                </form>
+                <div class="modal fade" id="processing-modal" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog modal-vertical-centered">
+                        <div class="row">
+                            <div id="loading">
+                                <ul class="bokeh">
+                                    <li></li>
+                                    <li></li>
+                                    <li></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
