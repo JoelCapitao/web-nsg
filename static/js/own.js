@@ -60,3 +60,15 @@ $(function(){
 function goBack() {
     window.history.back();
 }
+
+
+/**
+ * Delete modal, adjust the id of the project into the modal before deleting
+ */
+$(document).ready(function(){
+    $(".delete-modal").click(function(e){
+        var projectid = $(this).attr("projectid");
+            $("#delete-project").attr("href", "/project/delete/" + projectid);
+    e.preventDefault();
+    })
+});

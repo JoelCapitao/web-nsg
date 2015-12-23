@@ -41,23 +41,23 @@
                       <table class="table table-user-information">
                         <tbody>
                           <tr>
-                            <td>Client</td>
+                            <td><strong>Client</strong></td>
                             <td>{{ project.client }}</td>
                           </tr>
                           <tr>
-                            <td>Project Name</td>
+                            <td><strong>Project Name</strong></td>
                             <td>{{ project.projectName }}</td>
                           </tr>
                           <tr>
-                            <td>Subproject Name</td>
+                            <td><strong>Subproject Name</strong></td>
                             <td>{{ project.subProjectName }}</td>
                           </tr>
                           <tr>
-                            <td>Excel File</td>
+                            <td><strong>Excel File</strong></td>
                             <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.excelFile }}" target="_blank" download="">{{ project.excelFile }}</a></td>
                           </tr>
                           <tr>
-                            <td>Template File</td>
+                            <td><strong>Template File</strong></td>
                             <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.templateFile }}" target="_blank" download="">{{ project.templateFile }}</a></td>
                           </tr>
                         </tbody>
@@ -67,15 +67,15 @@
                           <table class="table table-user-information">
                         <tbody>
                           <tr>
-                            <td>Number of variables</td>
+                            <td><strong>Number of variables</strong></td>
                             <td>{{ project.numberOfVarToFill }}</td>
                           </tr>
                           <tr>
-                            <td>Number of variables resolved</td>
+                            <td><strong>Number of variables resolved</strong></td>
                             <td>{{ project.numberOfVarFilled }}</td>
                           </tr>
                           <tr>
-                            <td>Current Version</td>
+                            <td><strong>Current Version</strong></td>
                             <td>{{ project.currentVersion }}</td>
                           </tr>
                         </tbody>
@@ -184,7 +184,7 @@
                         <td>{{ equipment['Equipment'] }}</td>
                         <td>{{ equipment['Type'] }}</td>
                         <td>{{ equipment['filling_ratio']  }}</td>
-                        <td>{{ equipment['filling_ratio_in_perentage'] }}</td>
+                        <td>{{ equipment['filling_ratio_in_percentage'] }}</td>
                         <td data-toggle="collapse" data-target="#equipment{{ iterator.increment() }}" class="accordion-toggle"><button type='button' class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
                         <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ equipment['Hostname'] }}.txt" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
 
