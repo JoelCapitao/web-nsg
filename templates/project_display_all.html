@@ -45,18 +45,8 @@
                             <td>{{ p.subProjectName }}</td>
                             <td><a href="/download/{{ p.id }}/{{ p.excelFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
                             <td><a href="/download/{{ p.id }}/{{ p.templateFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
-                            <td>
-                                <a href="{{ url_for('project_update', id=p.id) }}">
-                                    <i class="glyphicon glyphicon-edit"></i>
-                                </a>
-                            </td>
-                            <td><p data-placement="top" data-toggle="tooltip" title="Delete"><button projectid="{{ p.id }}" class="btn btn-danger btn-xs delete-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><span class="glyphicon glyphicon-trash"></span></button></p></td>
-                            <!--<td>
-                                <a href="{{ url_for('project_delete', id=p.id) }}">
-                                    <i class="glyphicon glyphicon-remove"></i>
-                                </a>
-                            </td>
-                            -->
+                            <th><a href="{{ url_for('project_update', id=p.id) }}"  type="button" class="delete btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a></th>
+                            <th><a projectid="{{ p.id }}" type="button" class="btn btn-sm btn-danger delete-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><i class="glyphicon glyphicon-trash"></i></a></th>
                            </tr>
                         {% endfor %}
                     </tbody>
