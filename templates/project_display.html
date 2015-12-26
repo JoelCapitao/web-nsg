@@ -111,8 +111,8 @@
                                         <td>{{ version.version }}</td>
                                         <td>{{ version.numberOfVarFilled }}/{{ version.numberOfVarToFill  }}</td>
                                         <td>{{ version.fillingRatio }}</td>
-                                        <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.excelFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
-                                        <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.templateFile }}" target="_blank" download=""><span class="glyphicon glyphicon-file"></span></a></td>
+                                        <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
+                                        <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
                                         <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/zipFile" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
                                         <th><a href="/project/delete/version/{{ version.id }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a></th>
                                     </tr>
@@ -164,8 +164,8 @@
             <table id="mytable" class="table table-bordred table-striped" cellspacing="0">
                 <thead>
                     <tr>
-                        <th></th>
                         <th>#</th>
+                        <th>View</th>
                         <th>Hostname</th>
                         <th>Equipment</th>
                         <th>Type</th>
@@ -178,8 +178,8 @@
                 <tbody>
                     {% for equipment in equipments %}
                     <tr>
-                        <td><a href="/file/{{ project.id }}/{{ project.currentVersion }}/{{ equipment['Hostname'] }}" class="btn btn-default btn-xs" role="button" target="_blank"><span class="glyphicon glyphicon-file"></span></a></td>
                         <td>{{ iterator.value() }}</td>
+                        <td><a href="/file/{{ project.id }}/{{ project.currentVersion }}/{{ equipment['Hostname'] }}" role="button" target="_blank"><i class="fa fa-file-code-o fa-1x"></i></a></td>
                         <td>{{ equipment['Hostname']  }}</td>
                         <td>{{ equipment['Equipment'] }}</td>
                         <td>{{ equipment['Type'] }}</td>
