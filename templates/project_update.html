@@ -24,9 +24,9 @@
         <div class="container">
             <div class="col-sm-7">
                 <form method="POST" action="{{ url_for('project_update', id=project.id) }}" enctype="multipart/form-data">
-                    {{ render_field(form.client) }}
-                    {{ render_field(form.project_name) }}
-                    {{ render_field(form.subproject_name) }}
+                    {{ render_field(form.client, 'building') }}
+                    {{ render_field(form.project_name, 'briefcase') }}
+                    {{ render_field(form.subproject_name, 'folder') }}
                     <hr>
                     <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
                 </form>

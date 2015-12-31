@@ -1,9 +1,9 @@
-{% macro render_field(field) %}
+{% macro render_field(field, fa_icon) %}
     <div class="form-group {% if field.errors %}has-error{% endif %}">
-            <label for="user">{{ field.label }}</label>
+            {{ field.label }}
             <div class="input-group">
                 {{ field(class="form-control", **kwargs)|safe }}
-                <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
+                <span class="input-group-addon label-success"><span class="fa fa-{{ fa_icon }} fa-lg text-white"></span></span>
             </div>
             {% if field.errors %}
             {% for e in field.errors %}
@@ -13,12 +13,12 @@
     </div>
 {% endmacro %}
 
-{% macro render_upload_file(field) %}
+{% macro render_upload_file(field, fa_icon) %}
     <div class="form-group {% if field.errors %}has-error{% endif %}">
-            <label for="user">{{ field.label }}</label>
+            {{ field.label }}
             <div class="input-group">
                 {{ field(class="form-control", **kwargs) }}
-                <span class="input-group-addon"><span class="glyphicon glyphicon-file"></span></span>
+                <span class="input-group-addon label-default"><span class="fa fa-{{ fa_icon }} fa-lg text-white"></span></span>
             </div>
             {% if field.errors %}
             {% for e in field.errors %}
