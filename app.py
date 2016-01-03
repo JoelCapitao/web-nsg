@@ -46,7 +46,7 @@ def project_new():
 
         data_of_equipments = list()
         for equipment in equipments:
-            equipment.save_script_as(project_folder, equipment.get_value_of_var('Hostname', wb))
+            equipment.save_script_as(project_folder, equipment.hostname)
 
             versioning_data['to_fill'] += equipment.get_nbr_of_var_to_fill_in()
             versioning_data['filled'] += equipment.get_resolved_var()
@@ -192,7 +192,7 @@ def project_new_version(id):
 
         data_of_equipments = list()
         for equipment in equipments:
-            equipment.save_script_as(new_project_folder, equipment.get_value_of_var('Hostname', wb))
+            equipment.save_script_as(new_project_folder, equipment.hostname)
 
             versioning_data['to_fill'] += equipment.get_nbr_of_var_to_fill_in()
             versioning_data['filled'] += equipment.get_resolved_var()

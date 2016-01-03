@@ -10,7 +10,6 @@
                 <table id="mytable" class="table table-bordred table-striped" cellspacing="0">
                     <thead>
                         <tr>
-                            <th></th>
                             <th>#</th>
                             <th>Hostname</th>
                             <th>Equipment</th>
@@ -18,13 +17,13 @@
                             <th>Filling ratio</th>
                             <th>Percentage</th>
                             <th>Error</th>
+                            <th>View</th>
                             <th>Download</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for equipment in equipments %}
                         <tr>
-                            <td><a href="/file/{{ equipment['Hostname'] }}" class="btn btn-default btn-xs" role="button" target="_blank"><span class="glyphicon glyphicon-file"></span></a></td>
                             <td>{{ iterator.value() }}</td>
                             <td>{{ equipment['Hostname']  }}</td>
                             <td>{{ equipment['Equipment'] }}</td>
@@ -32,6 +31,7 @@
                             <td>{{ equipment['filling_ratio']  }}</td>
                             <td>{{ equipment['filling_ratio_in_percentage'] }}</td>
                             <td data-toggle="collapse" data-target="#equipment{{ iterator.increment() }}" class="accordion-toggle"><button type='button' class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
+                            <td><a href="/file/{{ equipment['Hostname'] }}" role="button" target="_blank"><i class="fa fa-file-code-o fa-1x"></i></a></td>
                             <td><a href="/download/{{ equipment['project_folder'] }}/{{ equipment['Hostname']  }}.txt" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
 
                         </tr>
