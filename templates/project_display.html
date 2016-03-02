@@ -82,7 +82,7 @@
                       </table>
                           <div class="col-md-9 col-md-offset-5">
                               <div class="row">
-                                  <a href="/download/{{ project.id }}/{{ project.currentVersion }}/zipFile"><i class="fa fa-download fa-5x" ></i></a>
+                                  <a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.zipFile }}"><i class="fa fa-download fa-5x" ></i></a>
                               </div>
                           </div>
                       </div>
@@ -113,7 +113,7 @@
                                         <td>{{ version.fillingRatio }}</td>
                                         <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
                                         <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
-                                        <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/zipFile" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
+                                        <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.zipFile }}" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
                                         <th><a href="/project/delete/version/{{ version.id }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a></th>
                                     </tr>
                                     {% endfor %}

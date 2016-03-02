@@ -82,6 +82,11 @@ def project_add():
                           project_data['subproject_name'])
         post_add = project.add(project)
 
+        if project_data['subproject_name']:
+            zf_name = "scripts-{0}-{1}-{2}-v1.zip".format(project_data['client'], project_data['project_name'], project_data['subproject_name'])
+        else:
+            zf_name = "scripts-{0}-{1}-v1.zip".format(project_data['client'], project_data['project_name'])
+
         project = last_project()
         project_versioning = ProjectVersioning(1,
                                                versioning_data['excel_file'],
@@ -89,17 +94,13 @@ def project_add():
                                                versioning_data['to_fill'],
                                                versioning_data['filled'],
                                                versioning_data['fillingRatio'],
+                                               zf_name,
                                                project)
         project_versioning = project_versioning.add(project_versioning)
 
         if not post_add and not project_versioning:
             new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(project.id), 'v1')
             move(session['project_folder'], new_project_folder)
-
-            if project_data['subproject_name']:
-                zf_name = "scripts-{0}-{1}-{2}-v1.zip".format(project_data['client'], project_data['project_name'], project_data['subproject_name'])
-            else:
-                zf_name = "scripts-{0}-{1}-v1.zip".format(project_data['client'], project_data['project_name'])
 
             try:
                 zip_file(new_project_folder, os.path.join(new_project_folder, zf_name))
@@ -141,7 +142,7 @@ def project_display(id):
     if project:
         all_version_of_the_project = project.version.all()
         last_version_of_the_project = all_version_of_the_project[-1]
-        for item in ('excelFile', 'templateFile', 'numberOfVarToFill', 'numberOfVarFilled', 'fillingRatio'):
+        for item in ('excelFile', 'templateFile', 'numberOfVarToFill', 'numberOfVarFilled', 'fillingRatio', 'zipFile'):
             setattr(project, item, getattr(last_version_of_the_project, item))
         # The attribute 'version' is not in the loop because the object does not accept an attr with that name
         # So I replace 'version' by 'current_version'

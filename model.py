@@ -106,16 +106,19 @@ class ProjectVersioning(db.Model):
     numberOfVarToFill = db.Column(db.Integer)
     numberOfVarFilled = db.Column(db.Integer)
     fillingRatio = db.Column(db.String(255))
+    zipFile = db.Column(db.String(255))
     projectId = db.Column(db.Integer, db.ForeignKey('project.id'))
     created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
-    def __init__(self, version, excelFile, templateFile, numberOfVarToFill, numberOfVarFilled, fillingRatio, project):
+    def __init__(self, version, excelFile, templateFile, numberOfVarToFill, numberOfVarFilled, fillingRatio, zipFile,
+                 project):
         self.version = version
         self.excelFile = excelFile
         self.templateFile = templateFile
         self.numberOfVarToFill = numberOfVarToFill
         self.numberOfVarFilled = numberOfVarFilled
         self.fillingRatio = fillingRatio
+        self.zipFile = zipFile
         self.project = project
 
     def add(self, projectVersioning):
