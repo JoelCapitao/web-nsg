@@ -43,8 +43,8 @@
                             <td>{{ p.client }}</td>
                             <td>{{ p.projectName }}</td>
                             <td>{{ p.subProjectName }}</td>
-                            <td><a href="/download/{{ p.id }}/{{ p.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
-                            <td><a href="/download/{{ p.id }}/{{ p.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
+                            <td><a href="/download/{{ p.id }}/{{ p.lastVersion }}/{{ p.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
+                            <td><a href="/download/{{ p.id }}/{{ p.lastVersion }}/{{ p.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
                             <th><a href="{{ url_for('project_update', id=p.id) }}"  type="button" class="delete btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a></th>
                             <th><a projectid="{{ p.id }}" type="button" class="btn btn-sm btn-danger delete-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><i class="glyphicon glyphicon-trash"></i></a></th>
                            </tr>

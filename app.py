@@ -133,6 +133,8 @@ def project_display_all():
             last_version = _all_version_of_the_project[-1]
             for item in ('excelFile', 'templateFile'):
                 setattr(_project, item, getattr(last_version, item))
+            # Because SQLAlchemy do not let us to set an attribute named 'version'
+            setattr(_project, 'lastVersion', str(getattr(last_version, 'version')))
 
     return render_template('project_display_all.html', project=projects)
 
