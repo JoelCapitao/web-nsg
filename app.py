@@ -7,9 +7,20 @@ from shutil import move
 from validationForm import ProjectForm, NewProjectVersionForm, ProjectUpdateForm
 from zip_list_of_files_in_memory import zip_file
 from fnmatch import fnmatch
+from flask.ext.login import LoginManager
 import pickle
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
+
+# Initializing Flask-Login configuring it
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# This callback is used to reload the user object from the user ID stored in the session
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 @app.route('/project/new', methods=['GET','POST'])
 def project_new():
