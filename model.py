@@ -25,6 +25,18 @@ class User(db.Model):
         self.password = password
         self.uid = uid
 
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id.encode('utf-8')
+
     def add(self, user):
         db.session.add(user)
         return session_commit()
