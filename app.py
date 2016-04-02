@@ -22,6 +22,35 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.get(user_id)
 
+
+@app.route('/register', methods=['GET','POST'])
+def register():
+    if request == 'GET':
+        return render_template('register.html')
+    #form = RegisterForm(request.form)
+    #and form.validate()
+    if request.method == 'POST':
+        user = User(request.form['firstname'],
+                    request.form['lastname'],
+                    request.form['mail'],
+                    request.form['password'],
+                    request.form['uid'])
+
+        error_while_adding_user = user.add(user)
+        if not error_while_adding_user:
+            flash('User successfully registered')
+            return redirect(url_for('login'))
+        else:
+            flash(error_while_adding_user)
+    return render_template('register.html')
+
+@app.route('/login',methods=['GET','POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    return redirect(url_for('login'))
+
+
 @app.route('/project/new', methods=['GET','POST'])
 def project_new():
     form = ProjectForm(request.form)
