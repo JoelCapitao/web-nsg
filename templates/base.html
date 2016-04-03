@@ -10,14 +10,35 @@
 {% endblock %}
 </head>
 <body>
-	<div class="navbar navbar-inverse navbar-fixed-top">
-	<div class="navbar-inner">	 
-		<div class="container">
-			<a href="#" class="navbar-brand">NetScriptGen</a> <button class="navbar-toggle"
-		    data-toggle="collapse" data-target=".navHeaderCollapse"></button>
-	    </div>
-	</div>
-	</div>
+    <!-- Second navbar for profile settings -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-4">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">NetScriptGen</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="navbar-collapse-4">
+          <ul class="nav navbar-nav navbar-right">
+              {% if g.user.is_authenticated()%}
+                <li><a href="#">Welcome Mister !</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+              {% endif %}
+              {% if not g.user.is_authenticated()%}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+              {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
 	<div class="container">
    		<div class="row">
 	   		<div class="col-md-2">

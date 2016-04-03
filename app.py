@@ -1,5 +1,5 @@
 import os
-from flask import render_template, request, flash, redirect, url_for, Response, session, send_file, send_from_directory
+from flask import render_template, request, flash, redirect, url_for, Response, session, send_file, send_from_directory, g
 from model import *
 from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
@@ -7,7 +7,7 @@ from shutil import move
 from validationForm import ProjectForm, NewProjectVersionForm, ProjectUpdateForm, RegisterForm, LoginForm
 from zip_list_of_files_in_memory import zip_file
 from fnmatch import fnmatch
-from flask.ext.login import LoginManager, login_user, login_required
+from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
 import pickle
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
@@ -21,6 +21,10 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter_by(id=int(user_id)).first()
+
+@app.before_request
+def before_request():
+    g.user = current_user
 
 
 @app.route('/register', methods=['GET','POST'])
@@ -68,6 +72,10 @@ def login():
 
     return render_template('login.html', form=form)
 
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/project/new', methods=['GET','POST'])
 @login_required
