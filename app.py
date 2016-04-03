@@ -25,27 +25,35 @@ def load_user(user_id):
 
 @app.route('/register', methods=['GET','POST'])
 def register():
-    if request == 'GET':
-        return render_template('register.html')
     form = RegisterForm(request.form)
+    if request.method == 'GET':
+        return render_template('register.html', form=form)
     if request.method == 'POST' and form.validate():
-        user = User(request.form['firstname'],
-                    request.form['lastname'],
-                    request.form['mail'],
-                    request.form['password'],
-                    request.form['uid'])
+        user_exists = User.query.filter_by(mail=request.form['email']).first()
+        print('---->{0}'.format(user_exists))
+        if not user_exists:
+            user = User(request.form['firstname'],
+                        request.form['lastname'],
+                        request.form['email'],
+                        request.form['password'],
+                        request.form['uid'])
 
-        error_while_adding_user = user.add(user)
-        if not error_while_adding_user:
-            flash('User successfully registered')
-            return redirect(url_for('login'))
+            error_while_adding_user = user.add(user)
+            if not error_while_adding_user:
+                flash('Congrats, registered successfully! You can now log in', 'success')
+                return redirect(url_for('login'))
+            else:
+                flash(error_while_adding_user, 'danger')
         else:
-            flash(error_while_adding_user)
+            flash('The user already exists', 'danger')
+            return render_template('register.html', form=form)
     return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET','POST'])
 def login():
     form = LoginForm(request.form)
+    if request.method == 'GET':
+        return render_template('login.html', form=form)
     if request.method == 'POST' and form.validate():
         return redirect(url_for('project_display_all'))
 

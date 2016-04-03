@@ -39,20 +39,26 @@ class RegisterForm(Form):
                             render_kw={"placeholder": "First Name"})
     lastname = StringField('Lastname', [validators.DataRequired(), validators.Length(max=25)],
                            render_kw={"placeholder": "Last Name"})
-    email = StringField('Email', [validators.Email,
-                                  validators.Length(max=320, message='Email must be less than 320 characters')],
+    email = StringField('Email', [validators.DataRequired(),
+                                  validators.Email(),
+                                  validators.Length(max=320)],
                         render_kw={"placeholder": "Email Address"})
     uid = StringField('User Id', [validators.DataRequired(),
-                                  validators.Length(max=7, message='User If must be less thant 7 characters')],
+                                  validators.Length(max=7)],
                       render_kw={"placeholder": "User Id"})
-    password = PasswordField('New Password', [validators.DataRequired(),
-                                              validators.EqualTo('confirm', message='Passwords must match')],
+    password = PasswordField('New Password',
+                             [validators.DataRequired(),
+                              validators.EqualTo('confirm', message='Passwords must match'),
+                              validators.Length(max=320)],
                              render_kw={"placeholder": "Password"})
-    confirm = PasswordField('Repeat Password', render_kw={"placeholder": "Confirm Password"})
+    confirm = PasswordField('Repeat Password',
+                            [validators.DataRequired(),
+                             validators.Length(max=320)],
+                            render_kw={"placeholder": "Confirm Password"})
 
 class LoginForm(Form):
-    email = StringField('Email', [validators.Email,
-                                  validators.Length(max=320, message='Email must be less than 320 characters')],
+    email = StringField('Email', [validators.Email(),
+                                  validators.Length(max=320)],
                         render_kw={"placeholder": "Email Address"})
     password = PasswordField('Password', [validators.DataRequired()],
                              render_kw={"placeholder": "Password"})
