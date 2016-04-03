@@ -35,17 +35,24 @@ class ProjectUpdateForm(Form):
     subproject_name = StringField('Subproject Name', [validators.optional(), validators.Length(max=35)])
 
 class RegisterForm(Form):
-    firstname = StringField('Firstname', [validators.DataRequired(), validators.Length(max=25)])
-    lastname = StringField('Lastname', [validators.DataRequired(), validators.Length(max=25)])
-    email = StringField('Email', [validators.Email, validators.Length(max=320,
-                                                                    message='Email must be less than 320 characters')])
-    uid = StringField('User Id', [validators.DataRequired(), validators.Length(max=7,
-                                                                    message='User If must be less thant 7 characters')])
-    password = PasswordField('New Password', [validators.DataRequired(), validators.EqualTo('confirm',
-                                                                    message='Passwords must match')])
-    confirm = PasswordField('Repeat Password')
+    firstname = StringField('Firstname', [validators.DataRequired(), validators.Length(max=25)],
+                            render_kw={"placeholder": "First Name"})
+    lastname = StringField('Lastname', [validators.DataRequired(), validators.Length(max=25)],
+                           render_kw={"placeholder": "Last Name"})
+    email = StringField('Email', [validators.Email,
+                                  validators.Length(max=320, message='Email must be less than 320 characters')],
+                        render_kw={"placeholder": "Email Address"})
+    uid = StringField('User Id', [validators.DataRequired(),
+                                  validators.Length(max=7, message='User If must be less thant 7 characters')],
+                      render_kw={"placeholder": "User Id"})
+    password = PasswordField('New Password', [validators.DataRequired(),
+                                              validators.EqualTo('confirm', message='Passwords must match')],
+                             render_kw={"placeholder": "Password"})
+    confirm = PasswordField('Repeat Password', render_kw={"placeholder": "Confirm Password"})
 
 class LoginForm(Form):
-    email = StringField('Email', [validators.Email, validators.Length(max=320,
-                                                                    message='Email must be less than 320 characters')])
-    password = PasswordField('Password', [validators.DataRequired()])
+    email = StringField('Email', [validators.Email,
+                                  validators.Length(max=320, message='Email must be less than 320 characters')],
+                        render_kw={"placeholder": "Email Address"})
+    password = PasswordField('Password', [validators.DataRequired()],
+                             render_kw={"placeholder": "Password"})
