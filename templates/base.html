@@ -28,7 +28,7 @@
         <div class="collapse navbar-collapse" id="navbar-collapse-4">
           <ul class="nav navbar-nav navbar-right">
               {% if g.user.is_authenticated()%}
-                <li><a href="#">Welcome Mister !</a></li>
+                <li><a href="{{ url_for('user_display', id=g.user.id) }}">Welcome {{ g.user.firstname }} {{ g.user.lastname }} !</a></li>
                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
               {% endif %}
               {% if not g.user.is_authenticated()%}

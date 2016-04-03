@@ -63,8 +63,11 @@ def login():
             flash('Your email or password does not match', 'danger')
         else:
             if user_exists.check_password(request.form['password']):
+                remember_me = False
+                if 'remember_me' in request.form:
+                    remember_me = True
                 # Creating a session on user's browser
-                login_user(user_exists)
+                login_user(user_exists, remember=remember_me)
                 flash('You have been logged in', 'success')
                 return redirect(url_for('project_display_all'))
             else:
