@@ -7,7 +7,7 @@ from shutil import move
 from validationForm import ProjectForm, NewProjectVersionForm, ProjectUpdateForm, RegisterForm, LoginForm
 from zip_list_of_files_in_memory import zip_file
 from fnmatch import fnmatch
-from flask.ext.login import LoginManager, login_user
+from flask.ext.login import LoginManager, login_user, login_required
 import pickle
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
@@ -70,6 +70,7 @@ def login():
 
 
 @app.route('/project/new', methods=['GET','POST'])
+@login_required
 def project_new():
     form = ProjectForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -130,6 +131,7 @@ def project_new():
 
 
 @app.route('/project/add', methods=['GET','POST'])
+@login_required
 def project_add():
     if request.method == 'POST':
         project_data = session.get('project_data')
@@ -183,6 +185,7 @@ def nsg_processing(excel_worbook, template_file):
 
 
 @app.route('/project')
+@login_required
 def project_display_all():
     projects = Project.query.all()
     for _project in projects:
@@ -197,6 +200,7 @@ def project_display_all():
     return render_template('project_display_all.html', project=projects)
 
 @app.route('/project/display/<id>', methods=['GET','POST'])
+@login_required
 def project_display(id):
     project = Project.query.get(id)
     if project:
@@ -221,6 +225,7 @@ def project_display(id):
 
 
 @app.route('/project/<id>/new', methods=['GET','POST'])
+@login_required
 def project_new_version(id):
     project = Project.query.get(id)
     all_version_of_the_project = project.version.all()
@@ -280,6 +285,7 @@ def project_new_version(id):
 
 
 @app.route('/project/<id>/upgrade', methods=['GET','POST'])
+@login_required
 def project_upgrade(id):
     if request.method == 'POST':
         versioning_data = session.get('versioning_data')
@@ -318,6 +324,7 @@ def project_upgrade(id):
 
 
 @app.route('/project/<id>/update', methods=['GET','POST'])
+@login_required
 def project_update(id):
     form = ProjectUpdateForm(request.form)
     project = Project.query.get(id)
@@ -348,6 +355,7 @@ def project_update(id):
 
 
 @app.route('/project/delete/version/<id>')
+@login_required
 def project_delete_version(id):
     project_versioning = ProjectVersioning.query.get(id)
 
@@ -365,6 +373,7 @@ def project_delete_version(id):
 
 
 @app.route('/project/delete/<id>')
+@login_required
 def project_delete(id):
     project = Project.query.get(id)
     all_versions_of_the_project = project.version.all()
@@ -391,12 +400,14 @@ def project_delete(id):
 
 
 @app.route('/user')
+@login_required
 def user_display_all():
     user = User.query.all()
     return render_template('user_display_all.html', user=user)
 
 
 @app.route('/user/display/<id>', methods=['GET','POST'])
+@login_required
 def user_display(id):
     user = User.query.get(id)
     if user is None:
@@ -406,6 +417,7 @@ def user_display(id):
 
 
 @app.route('/user/update/<id>', methods=['GET','POST'])
+@login_required
 def user_update(id):
     user = User.query.get(id)
     if user == None:
@@ -430,6 +442,7 @@ def user_update(id):
 
 
 @app.route('/user/delete/<id>')
+@login_required
 def user_delete(id):
     user = User.query.get(id)
     if user == None:
@@ -445,6 +458,7 @@ def user_delete(id):
 
 
 @app.route('/user/add', methods=['GET','POST'])
+@login_required
 def user_add():
     if request.method == 'POST':
         user = User(request.form['firstname'],
@@ -464,11 +478,13 @@ def user_add():
 
 
 @app.route('/customer')
+@login_required
 def customer_display_all():
     customer = Customer.query.all()
     return render_template('customer_display_all.html', customer=customer)
 
 @app.route('/customer/add', methods=['GET','POST'])
+@login_required
 def customer_add():
     if request.method == 'POST':
         customer = Customer(request.form['firstname'],
@@ -489,6 +505,7 @@ def customer_add():
 
 
 @app.route('/customer/update/<id>', methods=['GET','POST'])
+@login_required
 def customer_update(id):
     customer = Customer.query.get(id)
     if customer == None:
@@ -512,6 +529,7 @@ def customer_update(id):
     return render_template('customer_update.html', customer=customer, alert='None', message='')
 
 @app.route('/customer/delete/<id>')
+@login_required
 def customer_delete(id):
     customer = Customer.query.get(id)
     if customer == None:
@@ -526,6 +544,7 @@ def customer_delete(id):
     return redirect(url_for('customer_display_all'))
 
 @app.route('/customer/display/<id>', methods=['GET','POST'])
+@login_required
 def customer_display(id):
     customer = Customer.query.get(id)
     if customer is None:
@@ -534,12 +553,14 @@ def customer_display(id):
     return render_template('customer_display.html', customer=customer, alert='None', message='')
 
 @app.route('/file/<filename>')
+@login_required
 def return_file(filename):
     folder = session['project_folder']
     file = get_file(folder, filename + '.txt')
     return Response(file, mimetype="text/plain")
 
 @app.route('/file/<id>/<version>/<filename>')
+@login_required
 def return_file_by_id_and_version(id, version, filename):
     folder = os.path.join(app.config['UPLOAD_FOLDER'], id, 'v{0}'.format(version))
     file = get_file(folder, filename + '.txt')
@@ -553,12 +574,14 @@ def get_file(folder, filename):
         return str(exc)
 
 @app.route('/download/<id>/<version>/<filename>')
+@login_required
 def send_file_by_id_and_filename(id, version, filename):
     folder = os.path.join(app.config['UPLOAD_FOLDER'], id, 'v{0}'.format(version))
     return send_from_directory(folder, filename, as_attachment=True)
 
 
 @app.route('/download/<id>/<version>/zipFile')
+@login_required
 def send_zip_file_by_id_equal_to(id, version):
     project_folder = os.path.join(app.config['UPLOAD_FOLDER'], id, 'v{0}'.format(version))
     for _file in os.listdir(project_folder):
