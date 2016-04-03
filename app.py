@@ -7,7 +7,7 @@ from shutil import move
 from validationForm import ProjectForm, NewProjectVersionForm, ProjectUpdateForm, RegisterForm, LoginForm
 from zip_list_of_files_in_memory import zip_file
 from fnmatch import fnmatch
-from flask.ext.login import LoginManager
+from flask.ext.login import LoginManager, login_user
 import pickle
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
@@ -20,7 +20,7 @@ login_manager.login_view = 'login'
 # This callback is used to reload the user object from the user ID stored in the session
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    return User.query.filter_by(id=int(user_id)).first()
 
 
 @app.route('/register', methods=['GET','POST'])
@@ -30,7 +30,6 @@ def register():
         return render_template('register.html', form=form)
     if request.method == 'POST' and form.validate():
         user_exists = User.query.filter_by(mail=request.form['email']).first()
-        print('---->{0}'.format(user_exists))
         if not user_exists:
             user = User(request.form['firstname'],
                         request.form['lastname'],
@@ -55,7 +54,17 @@ def login():
     if request.method == 'GET':
         return render_template('login.html', form=form)
     if request.method == 'POST' and form.validate():
-        return redirect(url_for('project_display_all'))
+        user_exists = User.query.filter_by(mail=request.form['email']).first()
+        if not user_exists:
+            flash('Your email or password does not match', 'danger')
+        else:
+            if user_exists.check_password(request.form['password']):
+                # Creating a session on user's browser
+                login_user(user_exists)
+                flash('You have been logged in', 'success')
+                return redirect(url_for('project_display_all'))
+            else:
+                flash('Your email or password does not match', 'danger')
 
     return render_template('login.html', form=form)
 

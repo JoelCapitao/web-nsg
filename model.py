@@ -1,6 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
@@ -22,8 +23,14 @@ class User(db.Model):
         self.firstname = firstname
         self.lastname = lastname
         self.mail = mail
-        self.password = password
+        self.set_password(password)
         self.uid = uid
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+            return check_password_hash(self.password, password)
 
     def is_authenticated(self):
         return True
@@ -35,7 +42,8 @@ class User(db.Model):
         return False
 
     def get_id(self):
-        return self.id.encode('utf-8')
+        id = str(self.id)
+        return id.encode('utf-8')
 
     def add(self, user):
         db.session.add(user)

@@ -49,11 +49,13 @@ class RegisterForm(Form):
     password = PasswordField('New Password',
                              [validators.DataRequired(),
                               validators.EqualTo('confirm', message='Passwords must match'),
-                              validators.Length(max=320)],
+                              validators.Length(min=7),
+                              validators.Length(max=32)],
                              render_kw={"placeholder": "Password"})
     confirm = PasswordField('Repeat Password',
                             [validators.DataRequired(),
-                             validators.Length(max=320)],
+                             validators.Length(min=7),
+                             validators.Length(max=32)],
                             render_kw={"placeholder": "Confirm Password"})
 
 class LoginForm(Form):
