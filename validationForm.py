@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, validators, FileField, ValidationError
+from wtforms import Form, StringField, validators, FileField, ValidationError, PasswordField
 from flask.ext.wtf.file import FileRequired, FileAllowed, FileField as wtfFileField
 
 def check_excelfile(form, field):
@@ -33,3 +33,19 @@ class ProjectUpdateForm(Form):
     client = StringField('Client', [validators.DataRequired(), validators.Length(max=25)])
     project_name = StringField('Project Name', [validators.DataRequired(), validators.Length(max=35)])
     subproject_name = StringField('Subproject Name', [validators.optional(), validators.Length(max=35)])
+
+class RegisterForm(Form):
+    firstname = StringField('Firstname', [validators.DataRequired(), validators.Length(max=25)])
+    lastname = StringField('Lastname', [validators.DataRequired(), validators.Length(max=25)])
+    email = StringField('Email', [validators.Email, validators.Length(max=320,
+                                                                    message='Email must be less than 320 characters')])
+    uid = StringField('User Id', [validators.DataRequired(), validators.Length(max=7,
+                                                                    message='User If must be less thant 7 characters')])
+    password = PasswordField('New Password', [validators.DataRequired(), validators.EqualTo('confirm',
+                                                                    message='Passwords must match')])
+    confirm = PasswordField('Repeat Password')
+
+class LoginForm(Form):
+    email = StringField('Email', [validators.Email, validators.Length(max=320,
+                                                                    message='Email must be less than 320 characters')])
+    password = PasswordField('Password', [validators.DataRequired()])

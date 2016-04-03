@@ -4,7 +4,7 @@ from model import *
 from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
 from shutil import move
-from validationForm import ProjectForm, NewProjectVersionForm, ProjectUpdateForm
+from validationForm import ProjectForm, NewProjectVersionForm, ProjectUpdateForm, RegisterForm, LoginForm
 from zip_list_of_files_in_memory import zip_file
 from fnmatch import fnmatch
 from flask.ext.login import LoginManager
@@ -27,9 +27,8 @@ def load_user(user_id):
 def register():
     if request == 'GET':
         return render_template('register.html')
-    #form = RegisterForm(request.form)
-    #and form.validate()
-    if request.method == 'POST':
+    form = RegisterForm(request.form)
+    if request.method == 'POST' and form.validate():
         user = User(request.form['firstname'],
                     request.form['lastname'],
                     request.form['mail'],
@@ -42,13 +41,15 @@ def register():
             return redirect(url_for('login'))
         else:
             flash(error_while_adding_user)
-    return render_template('register.html')
+    return render_template('register.html', form=form)
 
-@app.route('/login',methods=['GET','POST'])
+@app.route('/login', methods=['GET','POST'])
 def login():
-    if request.method == 'GET':
-        return render_template('login.html')
-    return redirect(url_for('login'))
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        return redirect(url_for('project_display_all'))
+
+    return render_template('login.html', form=form)
 
 
 @app.route('/project/new', methods=['GET','POST'])

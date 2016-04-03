@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC>
 <html lang="en">
 <head>
+{% from "_formhelpers.html" import render_register_field %}
 {% block head %}
     <title>Sign in</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/own.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='fonts/font-awesome-4.5.0/css/font-awesome.css') }}">
 {% endblock %}
+{% block content %}
 </head>
 <body>
 <div>
@@ -22,10 +24,10 @@
             <div class="panel-body">
             <form role="form">
                 <div class="form-group">
-                    <input type="email" name="email" id="email" class="form-control " placeholder="Email Address" tabindex="4">
+                    {{ render_register_field(form.email) }}
                 </div>
                 <div class="form-group">
-                    <input type="password" name="password" id="password" class="form-control " placeholder="Password" tabindex="5">
+                    {{ render_register_field(form.password) }}
                 </div>
                 <div class="input-group">
                     <div class="checkbox" style="margin-top: 0px;">
@@ -55,6 +57,7 @@
         <p><a href="http://www.telindus.fr/" target="_blank" >© 2015 - SFR Business</a></p>
   </div>
 </footer>
+{% endblock %}
 {% block javascript %}
     <script src="{{ url_for('static', filename='js/jquery-1.11.3.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>

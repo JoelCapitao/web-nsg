@@ -24,6 +24,17 @@
             {% for e in field.errors %}
                 <p class="text-danger">{{ e }}</p>
             {% endfor %}
+            {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_register_field(field) %}
+    <div class="form-group {% if field.errors %}has-error{% endif %}">
+        {{ field(class="form-control", **kwargs)|safe }}
+        {% if field.errors %}
+            {% for e in field.errors %}
+                <p class="text-danger">{{ e }}</p>
+            {% endfor %}
         {% endif %}
     </div>
 {% endmacro %}
