@@ -68,6 +68,7 @@ def login():
                     remember_me = True
                 # Creating a session on user's browser
                 login_user(user_exists, remember=remember_me)
+                # TODO Flash this on the top of the Project Page
                 flash('You have been logged in', 'success')
                 return redirect(url_for('project_display_all'))
             else:

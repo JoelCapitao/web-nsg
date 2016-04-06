@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC>
 <html lang="en">
 <head>
-{% from "_formhelpers.html" import render_register_field %}
+{% from "_formhelpers.html" import render_register_field, render_input_field %}
 {% block head %}
     <title>Sign in</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
@@ -40,11 +40,7 @@
                     {{ render_register_field(form.password) }}
                 </div>
                 <div class="input-group">
-                    <div class="checkbox" style="margin-top: 0px;">
-                        <label>
-                          <input id="login-remember" type="checkbox" name="remember" value="1"> Remember me
-                        </label>
-                    </div>
+                    {{ render_input_field(form.remember_me, 'remember_me') }}
                 </div>
                 <button type="submit" class="btn btn-success">Sign In</button>
 

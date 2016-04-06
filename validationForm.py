@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, validators, FileField, ValidationError, PasswordField
+from wtforms import Form, StringField, validators, FileField, ValidationError, PasswordField, BooleanField
 from flask.ext.wtf.file import FileRequired, FileAllowed, FileField as wtfFileField
 
 def check_excelfile(form, field):
@@ -64,3 +64,4 @@ class LoginForm(Form):
                         render_kw={"placeholder": "Email Address"})
     password = PasswordField('Password', [validators.DataRequired()],
                              render_kw={"placeholder": "Password"})
+    remember_me = BooleanField('Remember me')
