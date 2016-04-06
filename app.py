@@ -68,8 +68,6 @@ def login():
                     remember_me = True
                 # Creating a session on user's browser
                 login_user(user_exists, remember=remember_me)
-                # TODO Flash this on the top of the Project Page
-                flash('You have been logged in', 'success')
                 return redirect(url_for('project_display_all'))
             else:
                 flash('Your email or password does not match', 'danger')
@@ -152,6 +150,7 @@ def project_add():
         project = Project(project_data['client'],
                           project_data['project_name'],
                           project_data['subproject_name'])
+        project.user = g.user
         post_add = project.add(project)
 
         if project_data['subproject_name']:
@@ -199,7 +198,8 @@ def nsg_processing(excel_worbook, template_file):
 @app.route('/project')
 @login_required
 def project_display_all():
-    projects = Project.query.all()
+    #projects = Project.query.all()
+    projects = Project.query.filter_by(user=g.user).all()
     for _project in projects:
         _all_version_of_the_project = _project.version.all()
         if _all_version_of_the_project:

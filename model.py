@@ -95,13 +95,19 @@ class Project(db.Model):
     projectName = db.Column(db.String(255), nullable=False)
     subProjectName = db.Column(db.String(255), nullable=True)
     version = db.relationship('ProjectVersioning', backref='project', lazy='dynamic')
+    public = db.Column(db.Boolean)
     created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User',
+        backref=db.backref('user', lazy='dynamic'))
 
 
-    def __init__(self, client, projectName, subProjectName):
+    def __init__(self, client, projectName, subProjectName, public=None):
         self.client = client
         self.projectName = projectName
         self.subProjectName = subProjectName
+        if public is None:
+            self.public = False
 
     def add(self, project):
         db.session.add(project)
