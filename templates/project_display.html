@@ -78,9 +78,14 @@
                             <td><strong>Current Version</strong></td>
                             <td>{{ project.currentVersion }}</td>
                           </tr>
+                          <tr>
+                              <td align="center">
+                                <input id="OnOffButton" type="checkbox" data-off-text="Private" data-on-text="Public" checked="false" state="{% if project.public == True %}true{% else %}false{% endif %}">
+                              </td>
+                          </tr>
                         </tbody>
                       </table>
-                          <div class="col-md-9 col-md-offset-5">
+                          <div class="col-md-6 col-md-offset-4">
                               <div class="row">
                                   <a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.zipFile }}"><i class="fa fa-download fa-5x" ></i></a>
                               </div>

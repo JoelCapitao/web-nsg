@@ -121,3 +121,27 @@ $(document).ready(function(){
         }
     });
 });
+
+
+/**
+ * On/Off button switch
+ */
+$('#OnOffButton').bootstrapSwitch();
+
+$('#OnOffButton').on('switchChange.bootstrapSwitch', function (){
+        var id = $(location).attr('href').split('/').slice(-1)[0]
+         $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '/project/privacy',
+                data: JSON.stringify({id: id}),
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+    }
+)

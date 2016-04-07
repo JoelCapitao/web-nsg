@@ -1,5 +1,5 @@
 import os
-from flask import render_template, request, flash, redirect, url_for, Response, session, send_file, send_from_directory, g
+from flask import render_template, request, flash, redirect, url_for, Response, session, send_file, send_from_directory, g, json
 from model import *
 from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
@@ -366,6 +366,22 @@ def project_update(id):
 
     return render_template('project_update.html', form=form, project=project)
 
+
+@app.route('/project/privacy', methods=['POST'])
+@login_required
+def project_privacy():
+    data_json = request.get_json()
+    if data_json:
+        if data_json['id']:
+            project = Project.query.get(data_json['id'])
+            if project.public is True:
+                project.public = False
+                session_commit()
+                return json.dumps({'status': 'OK', 'public': 'False'})
+            else:
+                project.public = True
+                session_commit()
+                return json.dumps({'status': 'OK', 'public': 'True'})
 
 @app.route('/project/delete/version/<id>')
 @login_required
