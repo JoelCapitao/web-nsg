@@ -304,26 +304,27 @@ def project_upgrade(id):
         project = Project.query.get(id)
         last_version_of_the_project = last_version_of_the_project_id_equal_to(id)
 
+        if project.subProjectName:
+            zf_name = "scripts-{0}-{1}-{2}-v{3}.zip".format(project.client,
+                                                            project.projectName,
+                                                            project.subProjectName,
+                                                            last_version_of_the_project.version + 1)
+        else:
+            zf_name = "scripts-{0}-{1}-v{2}.zip".format(project.client,
+                                                        project.projectName,
+                                                        last_version_of_the_project.version + 1)
+
         new_version = ProjectVersioning(last_version_of_the_project.version + 1,
                                         versioning_data['excel_file'],
                                         versioning_data['template_file'],
                                         versioning_data['to_fill'],
                                         versioning_data['filled'],
                                         versioning_data['fillingRatio'],
+                                        zf_name,
                                         project)
         error_in_creation_of_new_version = new_version.add(new_version)
 
         if not error_in_creation_of_new_version:
-            if project.subProjectName:
-                zf_name = "scripts-{0}-{1}-{2}-v{3}.zip".format(project.client,
-                                                                project.projectName,
-                                                                project.subProjectName,
-                                                                last_version_of_the_project.version + 1)
-            else:
-                zf_name = "scripts-{0}-{1}-v{2}.zip".format(project.client,
-                                                            project.projectName,
-                                                            last_version_of_the_project.version + 1)
-
             try:
                 zip_file(versioning_data['project_folder'], os.path.join(versioning_data['project_folder'], zf_name))
             except:
