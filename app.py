@@ -198,8 +198,10 @@ def nsg_processing(excel_worbook, template_file):
 @app.route('/project')
 @login_required
 def project_display_all():
-    #projects = Project.query.all()
-    projects = Project.query.filter_by(user=g.user).all()
+    projects = Project.query.filter(
+        (Project.user == g.user) |
+        (Project.public.isnot(False))
+    ).all()
     for _project in projects:
         _all_version_of_the_project = _project.version.all()
         if _all_version_of_the_project:

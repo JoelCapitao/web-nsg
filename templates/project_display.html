@@ -80,7 +80,7 @@
                           </tr>
                           <tr>
                               <td align="center">
-                                <input id="OnOffButton" type="checkbox" data-off-text="Private" data-on-text="Public" checked="false" state="{% if project.public == True %}true{% else %}false{% endif %}">
+                                <input id="OnOffButton" type="checkbox" data-off-text="Private" data-on-text="Public" {% if project.public == True %}checked{% endif %}>
                               </td>
                           </tr>
                         </tbody>
