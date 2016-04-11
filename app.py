@@ -231,8 +231,15 @@ def project_display(id):
             equipments = pickle.load(f)
 
         form = ProjectForm(request.form)
-        return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
-                               form=form, alert='None', message='', equipments=equipments, iterator=Integer(1))
+        users = User.query.all()
+        if g.user.id == project.user.id:
+            return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
+                               form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
+                                   user_can_edit=True, user_can_delete=True, users=users)
+        else:
+            return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
+                               form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
+                                   user_can_edit=False, user_can_delete=False, users=users)
     else:
         flash("The project does not exist in the database")
         return redirect(url_for('project_display_all'))

@@ -18,7 +18,7 @@
             {% endif %}
         {% endwith %}
         <div class="row">
-            <div class="col-md-12 col-lg-12 " >
+            <div class="col-md-12 col-lg-12" >
               <div class="panel panel-info">
                 <div class="panel-heading">
                   <h3 class="panel-title">{{ project.client }} - {{ project.projectName }}</h3>
@@ -78,11 +78,13 @@
                             <td><strong>Current Version</strong></td>
                             <td>{{ project.currentVersion }}</td>
                           </tr>
+                          {% if user_can_edit %}
                           <tr>
                               <td align="center">
                                 <input id="OnOffButton" type="checkbox" data-off-text="Private" data-on-text="Public" {% if project.public == True %}checked{% endif %}>
                               </td>
                           </tr>
+                          {% endif %}
                         </tbody>
                       </table>
                           <div class="col-md-6 col-md-offset-4">
@@ -107,7 +109,9 @@
                                         <th>Excel File</th>
                                         <th>Template File</th>
                                         <th>Zip File</th>
+                                        {% if user_can_delete %}
                                         <th></th>
+                                        {% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -119,7 +123,9 @@
                                         <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
                                         <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
                                         <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.zipFile }}" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
+                                        {% if user_can_delete %}
                                         <th><a href="/project/delete/version/{{ version.id }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a></th>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -127,38 +133,40 @@
                           </div>
                         </div>
                     </div>
-                     <div class="panel-footer">
-                         <a data-toggle="collapse" data-target="#equipment1" class="accordion-toggle"><button type='button' class="btn btn-primary">New version</button></a>
-                         <span class="pull-right">
-                                <a href="{{ url_for('project_update', id=project.id) }}" data-original-title="Edit this project" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
-                                <a projectid="{{ project.id }}" type="button" class="btn btn-sm btn-danger delete-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><i class="glyphicon glyphicon-trash"></i></a>
-                         </span>
-                         <div class="accordian-body collapse" id="equipment1">
-                             <div class="container">
-                                <div class="col-sm-7">
-                                <form method="POST" action="/project/{{ project.id }}/new" enctype="multipart/form-data">
-                                    {{ render_upload_file(form.excel_file, 'file-excel-o') }}
-                                    {{ render_upload_file(form.template_file, 'file-code-o') }}
-                                    <hr>
-                                    <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
-                                </form>
-                                    <div class="modal fade" id="processing-modal" role="dialog" aria-labelledby="myModalLabel">
-                                        <div class="modal-dialog modal-vertical-centered">
-                                            <div class="row">
-                                                    <div id="loading">
-                                                        <ul class="bokeh">
-                                                            <li></li>
-                                                            <li></li>
-                                                            <li></li>
-                                                        </ul>
-                                                    </div>
-                                            </div>
+                    {% if user_can_edit %}
+                    <div class="panel-footer">
+                     <a data-toggle="collapse" data-target="#equipment1" class="accordion-toggle"><button type='button' class="btn btn-primary">New version</button></a>
+                     <span class="pull-right">
+                            <a href="{{ url_for('project_update', id=project.id) }}" data-original-title="Edit this project" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
+                            <a projectid="{{ project.id }}" type="button" class="btn btn-sm btn-danger delete-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><i class="glyphicon glyphicon-trash"></i></a>
+                     </span>
+                     <div class="accordian-body collapse" id="equipment1">
+                         <div class="container">
+                            <div class="col-sm-7">
+                            <form method="POST" action="/project/{{ project.id }}/new" enctype="multipart/form-data">
+                                {{ render_upload_file(form.excel_file, 'file-excel-o') }}
+                                {{ render_upload_file(form.template_file, 'file-code-o') }}
+                                <hr>
+                                <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
+                            </form>
+                                <div class="modal fade" id="processing-modal" role="dialog" aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog modal-vertical-centered">
+                                        <div class="row">
+                                                <div id="loading">
+                                                    <ul class="bokeh">
+                                                        <li></li>
+                                                        <li></li>
+                                                        <li></li>
+                                                    </ul>
+                                                </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                         </div>
+                        </div>
                      </div>
+                    </div>
+                    {% endif %}
               </div>
             </div>
         </div>
@@ -209,6 +217,32 @@
                 </tbody>
             </table>
         </div>
+        <div class="col-sm-12 col-md-12">
+            <h1 class="text-muted">Collaborating Users</h1>
+        </div>
+        <div class="col-md-12 col-lg-12">
+            <div class="col-sm-6 col-md-6">
+                <div class="row" id="fields">
+                    <div class="btn btn-info btn-select btn-select-light">
+                        <input type="hidden" class="btn-select-input" id="" name="" value="" />
+                        <span class="btn-select-value">Select an Item</span>
+                        <span class='btn-select-arrow glyphicon glyphicon-chevron-down'></span>
+                        <ul>
+                            {% for user in users %}
+                                <li>{{ user.firstname }} {{ user.lastname }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-6">
+                <a class="btn btn-info" href="" role="button">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Add user</span>
+                </a>
+            </div>
+        </div>
+
     </div>
 
 
