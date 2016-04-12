@@ -129,7 +129,7 @@ $(document).ready(function(){
 $('#OnOffButton').bootstrapSwitch();
 
 $('#OnOffButton').on('switchChange.bootstrapSwitch', function (){
-        var id = $(location).attr('href').split('/').slice(-1)[0]
+        var id = $(location).attr('href').split('/').slice(-1)[0];
          $.ajax({
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
@@ -146,45 +146,59 @@ $('#OnOffButton').on('switchChange.bootstrapSwitch', function (){
     }
 )
 
+
 /**
-  * Select Button
+  * Add a new project user in the project page
   */
-$(document).ready(function () {
-    $(".btn-select").each(function (e) {
-        var value = $(this).find("ul li.selected").html();
-        if (value != undefined) {
-            $(this).find(".btn-select-input").val(value);
-            $(this).find(".btn-select-value").html(value);
+$(document).on('click', '.add-more', function(e){
+    e.preventDefault();
+    var next = 1;
+    console.log(next);
+    var href_add_user = $('.add-more').attr('href');
+    var uid = $("#user").val();
+    console.log(href_add_user)
+    uid = uid.split(/[\(),]+/)[1];
+    console.log(uid)
+    var addto = "#user" + next;
+    next = next + 1;
+
+    $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: href_add_user,
+        data: JSON.stringify({'uid': uid}),
+        dataType: 'json',
+        success: function(response) {
+            console.log(response);
+            var newIn = "<tr id='user" + next + "'><td align='center'><a href='/user/display/" + response['id'] + "'><i class='-alt fa fa-2x fa-user fa-fw'></i></a></td><td><h4><b>"+response['function']+"</b></h4><p>"+response['service']+"</p></td><td><img src='http://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png' class='img-circle' width='60'></td><td><h4><b>" + response['firstname'] + " " + response['lastname'] + "</b></h4><a href='mailto:" + response['mail'] + "'>" + response['mail'] + "</a></td><td><h5><b>Last update</b></h5></td><td><a href=''  type='button' class='delete btn btn-sm btn-danger'><i class='glyphicon glyphicon-trash'></i> Delete User</a></td></tr>"
+            var newInput = $(newIn);
+            $(addto).after(newInput);
+        },
+        error: function(error) {
+            console.log(error);
         }
     });
 });
 
-$(document).on('click', '.btn-select', function (e) {
+/**
+  * Remove an user project
+  */
+$(document).on('click', '.delete', function(e){
     e.preventDefault();
-    var ul = $(this).find("ul");
-    if ($(this).hasClass("active")) {
-        if (ul.find("li").is(e.target)) {
-            var target = $(e.target);
-            target.addClass("selected").siblings().removeClass("selected");
-            var value = target.html();
-            $(this).find(".btn-select-input").val(value);
-            $(this).find(".btn-select-value").html(value);
-        }
-        ul.hide();
-        $(this).removeClass("active");
-    }
-    else {
-        $('.btn-select').not(this).each(function () {
-            $(this).removeClass("active").find("ul").hide();
-        });
-        ul.slideDown(300);
-        $(this).addClass("active");
-    }
-});
+    var $button = $(this)
+    var href_remove_user = $(this).attr('href');
 
-$(document).on('click', function (e) {
-    var target = $(e.target).closest(".btn-select");
-    if (!target.length) {
-        $(".btn-select").removeClass("active").find("ul").hide();
-    }
+    $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: href_remove_user,
+        dataType: 'json',
+        success: function(response) {
+            if(response['is_removed'] == true)
+                $button.parent().parent().remove();
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
 });

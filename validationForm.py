@@ -46,6 +46,12 @@ class RegisterForm(Form):
     uid = StringField('User Id', [validators.DataRequired(),
                                   validators.Length(max=7)],
                       render_kw={"placeholder": "User Id"})
+    function = StringField('Function', [validators.DataRequired(),
+                                  validators.Length(max=32)],
+                      render_kw={"placeholder": "Function"})
+    service = StringField('Service', [validators.DataRequired(),
+                                  validators.Length(max=32)],
+                      render_kw={"placeholder": "Service"})
     password = PasswordField('New Password',
                              [validators.DataRequired(),
                               validators.EqualTo('confirm', message='Passwords must match'),

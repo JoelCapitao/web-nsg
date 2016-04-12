@@ -11,20 +11,25 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
 
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(255), nullable=False)
     lastname = db.Column(db.String(255), nullable=False)
     mail = db.Column(db.String(255))
     password = db.Column(db.String(255))
     uid = db.Column(db.String(7))
+    function = db.Column(db.String(32))
+    service = db.Column(db.String(32))
     created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
-    def __init__(self, firstname, lastname, mail, password, uid):
+    def __init__(self, firstname, lastname, mail, password, uid, function, service):
         self.firstname = firstname
         self.lastname = lastname
         self.mail = mail
         self.set_password(password)
         self.uid = uid
+        self.function = function
+        self.service = service
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -88,8 +93,14 @@ class Customer(db.Model):
         return session_commit()
 
 
+project_users = db.Table('project_users',
+                         db.Column('project_id', db.Integer, db.ForeignKey('project.id')),
+                         db.Column('user_id', db.Integer, db.ForeignKey('user.id')))
+
+
 class Project(db.Model):
 
+    __tablename__ = 'project'
     id = db.Column(db.Integer, primary_key=True)
     client = db.Column(db.String(255), nullable=False)
     projectName = db.Column(db.String(255), nullable=False)
@@ -98,9 +109,12 @@ class Project(db.Model):
     public = db.Column(db.Boolean)
     created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User',
-        backref=db.backref('user', lazy='dynamic'))
-
+    user = db.relationship('User', backref=db.backref('user', lazy='dynamic'))
+    users = db.relationship('User', secondary=project_users,
+                            primaryjoin=(project_users.c.project_id == id),
+                            secondaryjoin=(project_users.c.user_id == User.id),
+                            backref=db.backref('project_users', lazy='dynamic'),
+                            lazy='dynamic')
 
     def __init__(self, client, projectName, subProjectName, public=None):
         self.client = client
@@ -108,6 +122,25 @@ class Project(db.Model):
         self.subProjectName = subProjectName
         if public is None:
             self.public = False
+
+    def add_user(self, user):
+        if not self.is_user(user):
+            self.users.append(user)
+            session_commit()
+            return True
+        else:
+            return False
+
+    def delete_user(self, user):
+        if self.is_user(user):
+            self.users.remove(user)
+            session_commit()
+            return True
+        else:
+            return False
+
+    def is_user(self, user):
+        return self.users.filter(project_users.c.user_id == user.id).count() > 0
 
     def add(self, project):
         db.session.add(project)
@@ -134,10 +167,11 @@ class ProjectVersioning(db.Model):
     fillingRatio = db.Column(db.String(255))
     zipFile = db.Column(db.String(255))
     projectId = db.Column(db.Integer, db.ForeignKey('project.id'))
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def __init__(self, version, excelFile, templateFile, numberOfVarToFill, numberOfVarFilled, fillingRatio, zipFile,
-                 project):
+                 project, user):
         self.version = version
         self.excelFile = excelFile
         self.templateFile = templateFile
@@ -146,6 +180,7 @@ class ProjectVersioning(db.Model):
         self.fillingRatio = fillingRatio
         self.zipFile = zipFile
         self.project = project
+        self.user = user
 
     def add(self, projectVersioning):
         db.session.add(projectVersioning)
@@ -157,7 +192,6 @@ class ProjectVersioning(db.Model):
     def delete(self, projectVersioning):
         db.session.delete(projectVersioning)
         return session_commit()
-
 
 
 db.create_all()

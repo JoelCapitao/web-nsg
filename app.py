@@ -8,7 +8,7 @@ from validationForm import ProjectForm, NewProjectVersionForm, ProjectUpdateForm
 from zip_list_of_files_in_memory import zip_file
 from fnmatch import fnmatch
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
-import pickle
+import pickle, re
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
 
@@ -39,7 +39,9 @@ def register():
                         request.form['lastname'],
                         request.form['email'],
                         request.form['password'],
-                        request.form['uid'])
+                        request.form['uid'],
+                        request.form['function'],
+                        request.form['service'])
 
             error_while_adding_user = user.add(user)
             if not error_while_adding_user:
@@ -166,7 +168,8 @@ def project_add():
                                                versioning_data['filled'],
                                                versioning_data['fillingRatio'],
                                                zf_name,
-                                               project)
+                                               project,
+                                               g.user)
         project_versioning = project_versioning.add(project_versioning)
 
         if not post_add and not project_versioning:
@@ -178,7 +181,7 @@ def project_add():
             except:
                 pass
 
-            return redirect(url_for('project_display', id=last_id_of_the_table_project()))
+            return redirect(url_for('project_display', project_id=last_id_of_the_table_project()))
         else:
             error = post_add
             flash(error)
@@ -213,10 +216,10 @@ def project_display_all():
 
     return render_template('project_display_all.html', project=projects)
 
-@app.route('/project/display/<id>', methods=['GET','POST'])
+@app.route('/project/display/<project_id>', methods=['GET','POST'])
 @login_required
-def project_display(id):
-    project = Project.query.get(id)
+def project_display(project_id):
+    project = Project.query.get(project_id)
     if project:
         all_version_of_the_project = project.version.all()
         last_version_of_the_project = all_version_of_the_project[-1]
@@ -226,20 +229,22 @@ def project_display(id):
         # So I replace 'version' by 'current_version'
         setattr(project, 'currentVersion', getattr(last_version_of_the_project, 'version'))
 
-        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], id, 'v{0}'.format(last_version_of_the_project.version))
+        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], project_id,
+                                      'v{0}'.format(last_version_of_the_project.version))
         with open(os.path.join(project_folder, 'data.pickle'), 'rb') as f:
             equipments = pickle.load(f)
 
         form = ProjectForm(request.form)
         users = User.query.all()
+        project_users = project.users.all()
         if g.user.id == project.user.id:
             return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
-                                   user_can_edit=True, user_can_delete=True, users=users)
+                                   user_can_edit=True, user_can_delete=True, users=users, project_users=project_users)
         else:
             return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
-                                   user_can_edit=False, user_can_delete=False, users=users)
+                                   user_can_edit=False, user_can_delete=False, users=users, project_users=project_users)
     else:
         flash("The project does not exist in the database")
         return redirect(url_for('project_display_all'))
@@ -305,13 +310,13 @@ def project_new_version(id):
     return render_template('project.html', form=form)
 
 
-@app.route('/project/<id>/upgrade', methods=['GET','POST'])
+@app.route('/project/<project_id>/upgrade', methods=['GET','POST'])
 @login_required
-def project_upgrade(id):
+def project_upgrade(project_id):
     if request.method == 'POST':
         versioning_data = session.get('versioning_data')
-        project = Project.query.get(id)
-        last_version_of_the_project = last_version_of_the_project_id_equal_to(id)
+        project = Project.query.get(project_id)
+        last_version_of_the_project = last_version_of_the_project_id_equal_to(project_id)
 
         if project.subProjectName:
             zf_name = "scripts-{0}-{1}-{2}-v{3}.zip".format(project.client,
@@ -330,7 +335,8 @@ def project_upgrade(id):
                                         versioning_data['filled'],
                                         versioning_data['fillingRatio'],
                                         zf_name,
-                                        project)
+                                        project,
+                                        g.user)
         error_in_creation_of_new_version = new_version.add(new_version)
 
         if not error_in_creation_of_new_version:
@@ -339,7 +345,7 @@ def project_upgrade(id):
             except:
                 pass
 
-            return redirect(url_for('project_display', id=id))
+            return redirect(url_for('project_display', project_id=project_id))
         else:
             flash(error_in_creation_of_new_version)
     return redirect(url_for('project_display_all'))
@@ -374,6 +380,39 @@ def project_update(id):
         return redirect(url_for('project_display', id=id))
 
     return render_template('project_update.html', form=form, project=project)
+
+@app.route('/project/<id>/addUser', methods=['POST'])
+@login_required
+def project_add_user(id):
+    data_json = request.get_json()
+    if data_json:
+        if data_json['uid']:
+            user = User.query.filter_by(uid=data_json['uid']).first()
+            project = Project.query.filter_by(id=id).first()
+            error_adding_user = project.add_user(user)
+            if not error_adding_user:
+                user_data = dict()
+                for item in ('firstname', 'lastname', 'mail', 'id', 'function', 'service'):
+                    user_data[item] = getattr(user, item)
+                return json.dumps(user_data)
+
+
+@app.route('/project/<project_id>/removeUser/<user_id>', methods=['POST'])
+@login_required
+def project_remove_user(project_id, user_id):
+    project = Project.query.filter_by(id=project_id).first()
+    user = User.query.filter_by(id=user_id).first()
+    print('{}--------{}'.format(project, user))
+    if user is None:
+        return json.dumps({'is_removed': False})
+    if project is None:
+        return json.dumps({'is_removed': False})
+    is_user_removed = project.delete_user(user)
+    print(is_user_removed)
+    if is_user_removed is False:
+        return json.dumps({'is_removed': False})
+    return json.dumps({'is_removed': True})
+
 
 
 @app.route('/project/privacy', methods=['POST'])
@@ -458,15 +497,16 @@ def user_display(id):
 @login_required
 def user_update(id):
     user = User.query.get(id)
-    if user == None:
+    if user is None:
         flash("The user does not exist in the database")
         return redirect(url_for('user_display_all'))
     if request.method == 'POST':
         user = User(request.form['firstname'],
                     request.form['lastname'],
                     request.form['email'],
-                    request.form['password'],
                     request.form['quadri'],
+                    request.form['function'],
+                    request.form['service'],
                   )
         user_update = user.update(user)
         if not user_update:
@@ -498,12 +538,15 @@ def user_delete(id):
 @app.route('/user/add', methods=['GET','POST'])
 @login_required
 def user_add():
+    # TODO Add FORM Helper
     if request.method == 'POST':
         user = User(request.form['firstname'],
                     request.form['lastname'],
                     request.form['email'],
                     request.form['password'],
                     request.form['quadri'],
+                    request.form['function'],
+                    request.form['service'],
                   )
         post_add = user.add(user)
         if not post_add:
