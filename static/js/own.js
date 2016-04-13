@@ -144,39 +144,7 @@ $('#OnOffButton').on('switchChange.bootstrapSwitch', function (){
                 }
             });
     }
-)
-
-
-/**
-  * Add a new project user in the project page
-  */
-/**
-$(document).on('click', '.add-more', function(e){
-    e.preventDefault();
-    var href_add_user = $('.add-more').attr('href');
-    var uid = $("#user").val();
-    uid = uid.split(/[\(),]+/)[1];
-    var $addto = $("tr:last");
-    //var addto = "#project-user";
-
-    $.ajax({
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        url: href_add_user,
-        data: JSON.stringify({'uid': uid}),
-        dataType: 'json',
-        success: function(response) {
-            console.log(response);
-            var newIn = "<tr><td align='center'><a href='/user/display/" + response['id'] + "'><i class='-alt fa fa-2x fa-user fa-fw'></i></a></td><td><h4><b>"+response['function']+"</b></h4><p>"+response['service']+"</p></td><td><img src='http://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png' class='img-circle' width='60'></td><td><h4><b>" + response['firstname'] + " " + response['lastname'] + "</b></h4><a href='mailto:" + response['mail'] + "'>" + response['mail'] + "</a></td><td><h5><b>Last update</b></h5></td><td><a href=''  type='button' class='delete btn btn-sm btn-danger'><i class='glyphicon glyphicon-trash'></i> Delete User</a></td></tr>"
-            var newInput = $(newIn);
-            var addto = $("tr:last");
-            addto.after(newInput);
-        },
-        error: function(error) {
-            console.log(error);
-        }
-    });
-});*/
+);
 
 /**
   * Remove an user project
@@ -185,7 +153,7 @@ $(document).on('click', '.delete', function(e){
     e.preventDefault();
     var $button = $(this);
     var href_remove_user = $(this).attr('href');
-
+    var pouet = ['test'];
     $.ajax({
         type: "POST",
         contentType: "application/json; charset=utf-8",
@@ -204,7 +172,7 @@ $(document).on('click', '.delete', function(e){
 /**
  * Autocomplete input
  */
-$(function() {
+$(function autocomplete_input() {
     var input = $("input#user-input");
     var id = input.attr('name');
     var users = {};
@@ -228,7 +196,6 @@ $('input#user-input').keydown(function(e) {
         var input = $('input#user-input')
         var id = input.attr('name');
         var uid = input.val();
-        console.log(uid);
         uid = uid.split(/[\(),]+/)[1];
 
         $.ajax({
@@ -238,7 +205,6 @@ $('input#user-input').keydown(function(e) {
             data: JSON.stringify({'uid': uid}),
             dataType: 'json',
             success: function(response) {
-                console.log(response);
                 var newIn = "<tr><td align='center'><a href='/user/display/" + response['id'] + "'><i class='-alt fa fa-2x fa-user fa-fw'></i></a></td><td><h4><b>" + response['firstname'] + " " + response['lastname'] + "</b></h4></td><td><h4><b>" + response['function'] + "</b></h4></td><td><h4><b>" + response['service'] + "</td><td><h5><b>Last update</b></h5></td><td><a href='/project/" + id + "/removeUser/" + response['id'] + "'  type='button' class='delete btn btn-sm btn-danger'><i class='glyphicon glyphicon-trash'></i> Delete User</a></td></tr>"
                 var newInput = $(newIn);
                 var addto = $("tr:last");

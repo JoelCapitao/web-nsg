@@ -54,9 +54,17 @@
                                 <td>{{ p.user.firstname }} {{ p.user.lastname }}</td>
                                 <td><a href="/download/{{ p.id }}/{{ p.lastVersion }}/{{ p.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
                                 <td><a href="/download/{{ p.id }}/{{ p.lastVersion }}/{{ p.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
-                                <th><a href="{{ url_for('project_update', id=p.id) }}"  type="button" class="delete btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a></th>
-                                <th><a projectid="{{ p.id }}" type="button" class="btn btn-sm btn-danger delete-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><i class="glyphicon glyphicon-trash"></i></a></th>
-                               </tr>
+                                {% if g.user in p.users or g.user == p.user %}
+                                    <th><a href="{{ url_for('project_update', id=p.id) }}"  type="button" class="delete btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a></th>
+                                {% else %}
+                                    <th></th>
+                                {% endif %}
+                                {% if g.user.id == p.user.id %}
+                                    <th><a projectid="{{ p.id }}" type="button" class="btn btn-sm btn-danger delete-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><i class="glyphicon glyphicon-trash"></i></a></th>
+                                {% else %}
+                                    <th></th>
+                                {% endif %}
+                                </tr>
                             {% endfor %}
                         {% endif %}
                     </tbody>

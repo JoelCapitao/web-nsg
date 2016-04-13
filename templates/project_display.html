@@ -138,7 +138,9 @@
                      <a data-toggle="collapse" data-target="#equipment1" class="accordion-toggle"><button type='button' class="btn btn-primary">New version</button></a>
                      <span class="pull-right">
                             <a href="{{ url_for('project_update', id=project.id) }}" data-original-title="Edit this project" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
+                            {% if user_can_delete %}
                             <a projectid="{{ project.id }}" type="button" class="btn btn-sm btn-danger delete-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><i class="glyphicon glyphicon-trash"></i></a>
+                            {% endif %}
                      </span>
                      <div class="accordian-body collapse" id="equipment1">
                          <div class="container">
@@ -232,6 +234,7 @@
         </div>
             {% endif %}
             <div class="row">
+            <br><br>
             <div class="col-md-12 col-lg-12">
                 <table class="table table-hover table-striped">
                     <tbody id="project-user">
@@ -241,7 +244,7 @@
                         {% for user in project_users %}
                         <tr>
                             <td align="center">
-                                <a href="#"><i class="-alt fa fa-2x fa-user fa-fw"></i></a>
+                                <a href="{{ url_for('user_display', id=user.id) }}"><i class="-alt fa fa-2x fa-user fa-fw"></i></a>
                             </td>
                             <td>
                                 <h4>
@@ -293,9 +296,9 @@
       </div>
         <div class="modal-footer " id="mymodal">
         <a href="" type="button" id="delete-project" class="btn btn-success" ><span class="glyphicon glyphicon-ok-sign"></span> Yes</a>
-        <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> No</button>
-      </div>
+            <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> No</button>
         </div>
+    </div>
     <!-- /.modal-content -->
         </div>
       <!-- /.modal-dialog -->

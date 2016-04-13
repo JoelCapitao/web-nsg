@@ -241,6 +241,10 @@ def project_display(project_id):
             return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
                                    user_can_edit=True, user_can_delete=True, users=users, project_users=project_users)
+        elif g.user in project_users:
+            return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
+                               form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
+                                   user_can_edit=True, user_can_delete=False, users=users, project_users=project_users)
         else:
             return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
