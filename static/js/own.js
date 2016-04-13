@@ -150,6 +150,7 @@ $('#OnOffButton').on('switchChange.bootstrapSwitch', function (){
 /**
   * Add a new project user in the project page
   */
+/**
 $(document).on('click', '.add-more', function(e){
     e.preventDefault();
     var href_add_user = $('.add-more').attr('href');
@@ -175,7 +176,7 @@ $(document).on('click', '.add-more', function(e){
             console.log(error);
         }
     });
-});
+});*/
 
 /**
   * Remove an user project
@@ -198,4 +199,54 @@ $(document).on('click', '.delete', function(e){
             console.log(error);
         }
     });
+});
+
+/**
+ * Autocomplete input
+ */
+$(function() {
+    var input = $("input#user-input");
+    var id = input.attr('name');
+    var users = {};
+    $.ajax({
+    	url: "/project/" + id + "/users",
+    	async: false,
+    	dataType: 'json',
+    	success: function(data) {
+    		users = data;
+    	}
+    });
+    input.autocomplete({
+        source: [users]
+    });
+});
+
+
+$('input#user-input').keydown(function(e) {
+    if (e.keyCode == '13') {
+        e.preventDefault();
+        var input = $('input#user-input')
+        var id = input.attr('name');
+        var uid = input.val();
+        console.log(uid);
+        uid = uid.split(/[\(),]+/)[1];
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: '/project/'+ id + '/addUser',
+            data: JSON.stringify({'uid': uid}),
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                var newIn = "<tr><td align='center'><a href='/user/display/" + response['id'] + "'><i class='-alt fa fa-2x fa-user fa-fw'></i></a></td><td><h4><b>" + response['firstname'] + " " + response['lastname'] + "</b></h4></td><td><h4><b>" + response['function'] + "</b></h4></td><td><h4><b>" + response['service'] + "</td><td><h5><b>Last update</b></h5></td><td><a href='/project/" + id + "/removeUser/" + response['id'] + "'  type='button' class='delete btn btn-sm btn-danger'><i class='glyphicon glyphicon-trash'></i> Delete User</a></td></tr>"
+                var newInput = $(newIn);
+                var addto = $("tr:last");
+                addto.after(newInput);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
 });

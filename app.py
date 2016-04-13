@@ -402,16 +402,27 @@ def project_add_user(id):
 def project_remove_user(project_id, user_id):
     project = Project.query.filter_by(id=project_id).first()
     user = User.query.filter_by(id=user_id).first()
-    print('{}--------{}'.format(project, user))
     if user is None:
         return json.dumps({'is_removed': False})
     if project is None:
         return json.dumps({'is_removed': False})
     is_user_removed = project.delete_user(user)
-    print(is_user_removed)
     if is_user_removed is False:
         return json.dumps({'is_removed': False})
     return json.dumps({'is_removed': True})
+
+@app.route('/project/<project_id>/users', methods=['GET'])
+@login_required
+def project_get_users(project_id):
+    users = User.query.join(project_users, (project_users.c.user_id == User.id)).filter(project_users.c.project_id == project_id)
+    _users = list()
+    for user in users:
+        _users.append(user.id)
+    users = User.query.filter(~User.id.in_(_users))
+    list_of_users = list()
+    for user in users:
+        list_of_users.append('{} {} ({})'.format(user.firstname, user.lastname, user.uid))
+    return json.dumps(list_of_users)
 
 
 

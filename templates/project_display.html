@@ -225,20 +225,8 @@
             <div class="col-md-12 col-lg-12">
                 <div class="col-sm-6 col-md-6">
                     <div class="row" id="fields">
-                        <input autocomplete="on" class="form-control" id="user" name="prof1" type="text"
-                       placeholder="Type a firstname or lastname" list="users"/>
-                        <datalist id="users">
-                            {% for user in users %}
-                            <option value="{{ user.firstname }} {{ user.lastname }} ({{ user.uid }})">
-                        {% endfor %}
-                        </datalist>
+                        <input autocomplete="on" class="form-control" name="{{ project.id }}" id="user-input" type="text" placeholder="Type a firstname or lastname"/>
                     </div>
-                </div>
-                <div class="col-sm-6 col-md-6" id="button-add-user">
-                    <a class="btn btn-info add-more" href="{{ url_for('project_add_user', id=project.id) }}" role="button">
-                        <i class="glyphicon glyphicon-plus"></i>
-                        <span>Add user</span>
-                    </a>
                 </div>
             </div>
         </div>
@@ -248,7 +236,7 @@
                 <table class="table table-hover table-striped">
                     <tbody id="project-user">
                         <tr>
-                            
+
                         </tr>
                         {% for user in project_users %}
                         <tr>
