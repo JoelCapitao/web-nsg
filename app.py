@@ -389,8 +389,8 @@ def project_add_user(id):
         if data_json['uid']:
             user = User.query.filter_by(uid=data_json['uid']).first()
             project = Project.query.filter_by(id=id).first()
-            error_adding_user = project.add_user(user)
-            if not error_adding_user:
+            no_error_while_adding_user = project.add_user(user)
+            if no_error_while_adding_user:
                 user_data = dict()
                 for item in ('firstname', 'lastname', 'mail', 'id', 'function', 'service'):
                     user_data[item] = getattr(user, item)

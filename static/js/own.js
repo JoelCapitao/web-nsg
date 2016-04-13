@@ -152,15 +152,11 @@ $('#OnOffButton').on('switchChange.bootstrapSwitch', function (){
   */
 $(document).on('click', '.add-more', function(e){
     e.preventDefault();
-    var next = 1;
-    console.log(next);
     var href_add_user = $('.add-more').attr('href');
     var uid = $("#user").val();
-    console.log(href_add_user)
     uid = uid.split(/[\(),]+/)[1];
-    console.log(uid)
-    var addto = "#user" + next;
-    next = next + 1;
+    var $addto = $("tr:last");
+    //var addto = "#project-user";
 
     $.ajax({
         type: "POST",
@@ -170,9 +166,10 @@ $(document).on('click', '.add-more', function(e){
         dataType: 'json',
         success: function(response) {
             console.log(response);
-            var newIn = "<tr id='user" + next + "'><td align='center'><a href='/user/display/" + response['id'] + "'><i class='-alt fa fa-2x fa-user fa-fw'></i></a></td><td><h4><b>"+response['function']+"</b></h4><p>"+response['service']+"</p></td><td><img src='http://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png' class='img-circle' width='60'></td><td><h4><b>" + response['firstname'] + " " + response['lastname'] + "</b></h4><a href='mailto:" + response['mail'] + "'>" + response['mail'] + "</a></td><td><h5><b>Last update</b></h5></td><td><a href=''  type='button' class='delete btn btn-sm btn-danger'><i class='glyphicon glyphicon-trash'></i> Delete User</a></td></tr>"
+            var newIn = "<tr><td align='center'><a href='/user/display/" + response['id'] + "'><i class='-alt fa fa-2x fa-user fa-fw'></i></a></td><td><h4><b>"+response['function']+"</b></h4><p>"+response['service']+"</p></td><td><img src='http://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png' class='img-circle' width='60'></td><td><h4><b>" + response['firstname'] + " " + response['lastname'] + "</b></h4><a href='mailto:" + response['mail'] + "'>" + response['mail'] + "</a></td><td><h5><b>Last update</b></h5></td><td><a href=''  type='button' class='delete btn btn-sm btn-danger'><i class='glyphicon glyphicon-trash'></i> Delete User</a></td></tr>"
             var newInput = $(newIn);
-            $(addto).after(newInput);
+            var addto = $("tr:last");
+            addto.after(newInput);
         },
         error: function(error) {
             console.log(error);
@@ -185,7 +182,7 @@ $(document).on('click', '.add-more', function(e){
   */
 $(document).on('click', '.delete', function(e){
     e.preventDefault();
-    var $button = $(this)
+    var $button = $(this);
     var href_remove_user = $(this).attr('href');
 
     $.ajax({
