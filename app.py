@@ -381,7 +381,7 @@ def project_update(id):
             flash(error_occurred_while_updating)
             render_template('project_update.html', form=form, project=project)
 
-        return redirect(url_for('project_display', id=id))
+        return redirect(url_for('project_display', project_id=id))
 
     return render_template('project_update.html', form=form, project=project)
 
@@ -497,7 +497,7 @@ def user_display_all():
     user = User.query.all()
     return render_template('user_display_all.html', user=user)
 
-
+# TODO Refactoring user_display
 @app.route('/user/display/<id>', methods=['GET','POST'])
 @login_required
 def user_display(id):
@@ -508,6 +508,9 @@ def user_display(id):
     return render_template('user_display.html', user=user, alert='None', message='')
 
 
+# TODO Refactoring user_update
+# TODO Adding Second form for password
+# TODO Add FORM Helper
 @app.route('/user/update/<id>', methods=['GET','POST'])
 @login_required
 def user_update(id):
@@ -550,10 +553,11 @@ def user_delete(id):
     return redirect(url_for('user_display_all'))
 
 
+# TODO Deleting ?
 @app.route('/user/add', methods=['GET','POST'])
 @login_required
 def user_add():
-    # TODO Add FORM Helper
+
     if request.method == 'POST':
         user = User(request.form['firstname'],
                     request.form['lastname'],

@@ -28,7 +28,8 @@
                             <th><input type="text" class="form-control" placeholder="First Name" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Email" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Function" disabled></th>
-                            <th><input type="text" class="form-control" placeholder="Quadri" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Team" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="User Id" disabled></th>
                             <th><input type="hidden" class="form-control" placeholder=""</th>
                             <th><input type="hidden" class="form-control" placeholder=""></th>
                         </tr>
@@ -44,6 +45,7 @@
                             <td>{{ user.firstname }}</td>
                             <td>{{ user.mail }}</td>
                             <td>{{ user.function }}</td>
+                            <td>{{ user.service }}</td>
                             <td>{{ user.uid }}</td>
                             <td>
                                 <a href="{{ url_for('user_update', id=user.id) }}">
