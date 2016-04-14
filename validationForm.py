@@ -64,6 +64,7 @@ class RegisterForm(Form):
                              validators.Length(max=32)],
                             render_kw={"placeholder": "Confirm Password"})
 
+
 class LoginForm(Form):
     email = StringField('Email', [validators.Email(),
                                   validators.Length(max=320)],
@@ -71,3 +72,36 @@ class LoginForm(Form):
     password = PasswordField('Password', [validators.DataRequired()],
                              render_kw={"placeholder": "Password"})
     remember_me = BooleanField('Remember me')
+
+
+class ModifyPasswordForm(Form):
+    password = PasswordField('New Password',
+                             [validators.DataRequired(),
+                              validators.EqualTo('confirm', message='Passwords must match'),
+                              validators.Length(min=7),
+                              validators.Length(max=32)],
+                             render_kw={"placeholder": "Password"})
+    confirm = PasswordField('Repeat Password',
+                            [validators.DataRequired(),
+                             validators.Length(min=7),
+                             validators.Length(max=32)],
+                            render_kw={"placeholder": "Confirm Password"})
+
+class ModifyUserForm(Form):
+    firstname = StringField('Firstname', [validators.DataRequired(), validators.Length(max=25)],
+                            render_kw={"placeholder": "First Name"})
+    lastname = StringField('Lastname', [validators.DataRequired(), validators.Length(max=25)],
+                           render_kw={"placeholder": "Last Name"})
+    email = StringField('Email', [validators.DataRequired(),
+                                  validators.Email(),
+                                  validators.Length(max=320)],
+                        render_kw={"placeholder": "Email Address"})
+    uid = StringField('User Id', [validators.DataRequired(),
+                                  validators.Length(max=7)],
+                      render_kw={"placeholder": "User Id"})
+    function = StringField('Function', [validators.DataRequired(),
+                                  validators.Length(max=32)],
+                      render_kw={"placeholder": "Function"})
+    service = StringField('Service', [validators.DataRequired(),
+                                  validators.Length(max=32)],
+                      render_kw={"placeholder": "Service"})

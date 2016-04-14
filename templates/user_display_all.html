@@ -37,7 +37,7 @@
                     <tbody>
                         <tr>
                         {% for user in user %}
-                            <td><a href="{{ url_for('user_display', id=user.id) }}">
+                            <td><a href="{{ url_for('user_display', user_id=user.id) }}">
                                         <i class="glyphicon glyphicon-user"></i>
                                 </a>
                             </td>
@@ -48,12 +48,12 @@
                             <td>{{ user.service }}</td>
                             <td>{{ user.uid }}</td>
                             <td>
-                                <a href="{{ url_for('user_update', id=user.id) }}">
+                                <a href="{{ url_for('user_update', user_id=user.id) }}">
                                     <i class="glyphicon glyphicon-edit"></i>
                                 </a>
                             </td>
                             <td>
-                                <a href="{{ url_for('user_delete', id=user.id) }}">
+                                <a href="{{ url_for('user_delete', user_id=user.id) }}">
                                     <i class="glyphicon glyphicon-remove"></i>
                                 </a>
                             </td>

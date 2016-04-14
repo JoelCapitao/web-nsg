@@ -34,6 +34,10 @@ class User(db.Model):
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
+    def update_password(self, password):
+        self.set_password(password)
+        return session_commit()
+
     def check_password(self, password):
             return check_password_hash(self.password, password)
 
@@ -54,7 +58,9 @@ class User(db.Model):
         db.session.add(user)
         return session_commit()
 
-    def update(self):
+    def update(self, data):
+        for key, value in data.items():
+            setattr(self, key, value)
         return session_commit()
 
     def delete(self, user):
@@ -87,6 +93,7 @@ class Customer(db.Model):
 
     def update(self):
         return session_commit()
+
 
     def delete(self, customer):
         db.session.delete(customer)

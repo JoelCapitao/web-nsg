@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Editing{% endblock %}
+{% from "_formhelpers.html" import render_field_with_value, render_field, render_register_field %}
 {% block content %}
     <div class="container">
     <div class="row">
@@ -16,34 +17,31 @@
     </div>
     <div class="row">
         <div class="col-sm-5">
-            <form method="POST" action="/user/update/{{ user.id }}" enctype="multipart/form-data">
+            <form name="modify_user_form" method="POST" action="{{ url_for('user_update', user_id=user.id) }}" enctype="multipart/form-data">
                 <div class="form-group">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="lastname" id="lastname" value="{{ user.lastname }}" required>
-                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="firstname" id="firstname" value="{{ user.firstname }}" required>
-                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
-                    </div>
-                    <div class="input-group" data-validate="email">
-                        <input type="text" class="form-control" name="email" id="email" value="{{ user.mail }}" required>
-                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
-                    </div>
-                    <div class="input-group" data-validate="quadri">
-                        <input type="text" class="form-control" name="quadri" id="quadri" value="{{ user.uid }}" required>
-                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
-                    </div>
-                    <div class="input-group" data-validate="function">
-                        <input type="text" class="form-control" name="function" id="function" placeholder="Function" required>
-                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
-                    </div>
-                    <div class="input-group" data-validate="service">
-                        <input type="text" class="form-control" name="service" id="service" placeholder="Service" required>
-                        <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
-                    </div>
+                    {{ render_field_with_value(modify_user_form.firstname, user.firstname, 'user') }}
+                    {{ render_field_with_value(modify_user_form.lastname, user.lastname, 'user') }}
+                    {{ render_field_with_value(modify_user_form.email, user.mail, 'envelope') }}
+                    {{ render_field_with_value(modify_user_form.uid, user.uid, 'envelope') }}
+                    {{ render_field_with_value(modify_user_form.function, user.function, 'briefcase') }}
+                    {{ render_field_with_value(modify_user_form.service, user.service, 'briefcase') }}
                 </div>
-            <button type="submit" class="btn btn-primary col-xs-12">Submit</button>
+                <br/>
+            <button type="submit" class="btn btn-primary col-xs-6">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <h2>Modify password</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-5">
+            <form name="modify_password_form" method="POST" action="{{ url_for('user_update_password', user_id=user.id) }}" enctype="multipart/form-data">
+                {{ render_register_field(modify_password_form.password) }}
+                {{ render_register_field(modify_password_form.confirm) }}
+                <br/>
+            <button type="submit" class="btn btn-primary col-xs-6">Modify password</button>
+            </form>
         </div>
     </div>
 </div>

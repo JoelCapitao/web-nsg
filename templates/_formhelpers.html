@@ -13,6 +13,21 @@
     </div>
 {% endmacro %}
 
+{% macro render_field_with_value(field, value, fa_icon) %}
+    <div class="form-group {% if field.errors %}has-error{% endif %}">
+            {{ field.label }}
+            <div class="input-group">
+                {{ field(class="form-control", value=value, **kwargs)|safe }}
+                <span class="input-group-addon label-success"><span class="fa fa-{{ fa_icon }} fa-lg text-white"></span></span>
+            </div>
+            {% if field.errors %}
+            {% for e in field.errors %}
+                <p class="text-danger">{{ e }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endmacro %}
+
 {% macro render_upload_file(field, fa_icon) %}
     <div class="form-group {% if field.errors %}has-error{% endif %}">
             {{ field.label }}

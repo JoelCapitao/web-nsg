@@ -4,7 +4,7 @@ from model import *
 from netscriptgen import NetScriptGen, Integer
 from werkzeug import secure_filename
 from shutil import move
-from validationForm import ProjectForm, NewProjectVersionForm, ProjectUpdateForm, RegisterForm, LoginForm
+from validationForm import *
 from zip_list_of_files_in_memory import zip_file
 from fnmatch import fnmatch
 from flask.ext.login import LoginManager, login_user, login_required, logout_user, current_user
@@ -498,10 +498,10 @@ def user_display_all():
     return render_template('user_display_all.html', user=user)
 
 # TODO Refactoring user_display
-@app.route('/user/display/<id>', methods=['GET','POST'])
+@app.route('/user/display/<user_id>', methods=['GET','POST'])
 @login_required
-def user_display(id):
-    user = User.query.get(id)
+def user_display(user_id):
+    user = User.query.get(user_id)
     if user is None:
         flash("The user does not exist in the database")
         return redirect(url_for('user_display_all'))
@@ -511,36 +511,56 @@ def user_display(id):
 # TODO Refactoring user_update
 # TODO Adding Second form for password
 # TODO Add FORM Helper
-@app.route('/user/update/<id>', methods=['GET','POST'])
+@app.route('/user/update/<user_id>', methods=['GET', 'POST'])
 @login_required
-def user_update(id):
-    user = User.query.get(id)
+def user_update(user_id):
+    modify_user_form = ModifyUserForm(request.form, prefix="modify_user_form")
+    user = User.query.get(user_id)
     if user is None:
         flash("The user does not exist in the database")
         return redirect(url_for('user_display_all'))
-    if request.method == 'POST':
-        user = User(request.form['firstname'],
-                    request.form['lastname'],
-                    request.form['email'],
-                    request.form['quadri'],
-                    request.form['function'],
-                    request.form['service'],
-                  )
-        user_update = user.update(user)
-        if not user_update:
+    if request.method == 'POST' and modify_user_form.validate():
+        data = {'firstname': request.form['modify_user_form-firstname'],
+                    'lastname': request.form['modify_user_form-lastname'],
+                    'mail': request.form['modify_user_form-email'],
+                    'uid': request.form['modify_user_form-uid'],
+                    'function': request.form['modify_user_form-function'],
+                    'service': request.form['modify_user_form-service']}
+        error_while_updating_user = user.update(data)
+        if not error_while_updating_user:
             flash("Update was successful")
-            return redirect(url_for('user_display', id=id))
+            return redirect(url_for('user_display', user_id=user_id))
         else:
-            error=user_update
+            error = error_while_updating_user
             flash(error)
-    return render_template('user_update.html', user=user, alert='None', message='')
+    return render_template('user_update.html', user=user, modify_user_form=modify_user_form, modify_password_form=ModifyPasswordForm(), alert='None', message='')
 
 
-
-@app.route('/user/delete/<id>')
+@app.route('/user/update/password/<user_id>', methods=['GET', 'POST'])
 @login_required
-def user_delete(id):
-    user = User.query.get(id)
+def user_update_password(user_id):
+    modify_password_form = ModifyPasswordForm(request.form)
+    user = User.query.get(user_id)
+    if user is None:
+        flash("The user does not exist in the database")
+        return redirect(url_for('user_display_all'))
+    print('---------------->{}'.format(request.form))
+    print(modify_password_form.validate())
+    if request.method == 'POST' and modify_password_form.validate():
+        print(request.form['password'])
+        error_while_setting_new_password = user.update_password(request.form['password'])
+        if not error_while_setting_new_password:
+            flash("Update was successful")
+            return redirect(url_for('user_display', user_id=user_id))
+        else:
+            flash(error_while_setting_new_password)
+    return render_template('user_update.html', user=user, modify_user_form=ModifyUserForm(), modify_password_form=modify_password_form, alert='None', message='')
+
+
+@app.route('/user/delete/<user_id>')
+@login_required
+def user_delete(user_id):
+    user = User.query.get(user_id)
     if user == None:
         flash("This entry does not exist in the database")
         return redirect(url_for('user_display_all'))
