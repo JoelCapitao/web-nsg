@@ -20,6 +20,7 @@ class User(db.Model):
     uid = db.Column(db.String(7))
     function = db.Column(db.String(32))
     service = db.Column(db.String(32))
+    admin = db.Column(db.Boolean)
     created_on = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def __init__(self, firstname, lastname, mail, password, uid, function, service):
@@ -30,6 +31,7 @@ class User(db.Model):
         self.uid = uid
         self.function = function
         self.service = service
+        self.admin = False
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -39,7 +41,7 @@ class User(db.Model):
         return session_commit()
 
     def check_password(self, password):
-            return check_password_hash(self.password, password)
+        return check_password_hash(self.password, password)
 
     def is_authenticated(self):
         return True
@@ -49,6 +51,9 @@ class User(db.Model):
 
     def is_anonymous(self):
         return False
+
+    def is_admin(self):
+        return self.admin
 
     def get_id(self):
         id = str(self.id)
@@ -159,7 +164,7 @@ class Project(db.Model):
         return session_commit()
 
     def delete(self, project):
-        db.session.delete(project)
+        db.session.delete(self)
         return session_commit()
 
 

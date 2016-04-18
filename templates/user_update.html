@@ -25,6 +25,9 @@
                     {{ render_field_with_value(modify_user_form.uid, user.uid, 'envelope') }}
                     {{ render_field_with_value(modify_user_form.function, user.function, 'briefcase') }}
                     {{ render_field_with_value(modify_user_form.service, user.service, 'briefcase') }}
+                    {% if g.user.is_admin() == True %}
+                        {{ render_field_with_value(modify_user_form.service, user.service, 'briefcase') }}
+                    {% endif %}
                 </div>
                 <br/>
             <button type="submit" class="btn btn-primary col-xs-6">Submit</button>

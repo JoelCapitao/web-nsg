@@ -355,7 +355,7 @@ def project_upgrade(project_id):
     return redirect(url_for('project_display_all'))
 
 
-@app.route('/project/<id>/update', methods=['GET','POST'])
+@app.route('/project/int:<id>/update', methods=['GET','POST'])
 @login_required
 def project_update(id):
     form = ProjectUpdateForm(request.form)
@@ -561,16 +561,18 @@ def user_update_password(user_id):
 @login_required
 def user_delete(user_id):
     user = User.query.get(user_id)
+    project_of_the_user = Project.query.filter_by(user=user)
     if user == None:
         flash("This entry does not exist in the database")
         return redirect(url_for('user_display_all'))
-    post_delete = user.delete(user)
-    if not post_delete:
-        flash("User was deleted successfully")
-    else:
-        error = post_delete
-        flash(error)
-    return redirect(url_for('user_display_all'))
+    for project in project_of_the_user:
+        project.delete(project)
+
+    error_while_deleting_user = user.delete(user)
+    if error_while_deleting_user:
+        flash("An error occured while deleting the user")
+
+    return redirect(url_for('login'))
 
 
 # TODO Deleting ?

@@ -30,8 +30,10 @@
                             <th><input type="text" class="form-control" placeholder="Function" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Team" disabled></th>
                             <th><input type="text" class="form-control" placeholder="User Id" disabled></th>
-                            <th><input type="hidden" class="form-control" placeholder=""</th>
+                            {% if g.user.is_admin() == True %}
                             <th><input type="hidden" class="form-control" placeholder=""></th>
+                            <th><input type="hidden" class="form-control" placeholder=""></th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -47,6 +49,7 @@
                             <td>{{ user.function }}</td>
                             <td>{{ user.service }}</td>
                             <td>{{ user.uid }}</td>
+                            {% if g.user.is_admin() == True %}
                             <td>
                                 <a href="{{ url_for('user_update', user_id=user.id) }}">
                                     <i class="glyphicon glyphicon-edit"></i>
@@ -57,6 +60,7 @@
                                     <i class="glyphicon glyphicon-remove"></i>
                                 </a>
                             </td>
+                            {% endif %}
                            </tr>
                         {% endfor %}
                     </tbody>

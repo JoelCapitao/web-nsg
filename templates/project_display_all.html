@@ -55,7 +55,7 @@
                                 <td><a href="/download/{{ p.id }}/{{ p.lastVersion }}/{{ p.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
                                 <td><a href="/download/{{ p.id }}/{{ p.lastVersion }}/{{ p.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
                                 {% if g.user in p.users or g.user == p.user %}
-                                    <th><a href="{{ url_for('project_update', id=p.id) }}"  type="button" class="delete btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a></th>
+                                    <th><a href="{{ url_for('project_update', id=p.id) }}"  type="button" class="edit btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a></th>
                                 {% else %}
                                     <th></th>
                                 {% endif %}

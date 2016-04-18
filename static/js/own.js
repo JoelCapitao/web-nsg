@@ -166,7 +166,6 @@ $(document).on('click', '.delete', function(e){
     e.preventDefault();
     var $button = $(this);
     var href_remove_user = $(this).attr('href');
-    var pouet = ['test'];
     $.ajax({
         type: "POST",
         contentType: "application/json; charset=utf-8",
