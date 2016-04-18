@@ -244,7 +244,7 @@
                         {% for user in project_users %}
                         <tr>
                             <td align="center">
-                                <a href="{{ url_for('user_display', id=user.id) }}"><i class="-alt fa fa-2x fa-user fa-fw"></i></a>
+                                <a href="{{ url_for('user_display', user_id=user.id) }}"><i class="-alt fa fa-2x fa-user fa-fw"></i></a>
                             </td>
                             <td>
                                 <h4>

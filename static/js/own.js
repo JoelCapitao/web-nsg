@@ -75,6 +75,19 @@ $(document).ready(function(){
 
 
 /**
+ * Delete user within modal
+ */
+$(document).ready(function(){
+    $(".delete-user-modal").click(function(e){
+        var href = $(this).attr("project");
+            console.log(href);
+            $("#delete-user").attr("href", href);
+    e.preventDefault();
+    })
+});
+
+
+/**
  *Gestion des tableaux filtrant
  */
 
