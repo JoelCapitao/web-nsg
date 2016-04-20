@@ -521,11 +521,13 @@ def user_update(user_id):
         return redirect(url_for('user_display_all'))
     if request.method == 'POST' and modify_user_form.validate():
         data = {'firstname': request.form['modify_user_form-firstname'],
-                    'lastname': request.form['modify_user_form-lastname'],
-                    'mail': request.form['modify_user_form-email'],
-                    'uid': request.form['modify_user_form-uid'],
-                    'function': request.form['modify_user_form-function'],
-                    'service': request.form['modify_user_form-service']}
+                'lastname': request.form['modify_user_form-lastname'],
+                'mail': request.form['modify_user_form-email'],
+                'uid': request.form['modify_user_form-uid'],
+                'function': request.form['modify_user_form-function'],
+                'service': request.form['modify_user_form-service'],
+                'admin': request.form['admin']}
+        print('---------------------------->{}'.format(request.form['admin']))
         error_while_updating_user = user.update(data)
         if not error_while_updating_user:
             flash("Update was successful")

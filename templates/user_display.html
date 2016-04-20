@@ -48,16 +48,17 @@
                     </tr>
                     </tbody>
                   </table>
-                  <a href="#" class="btn btn-primary">View Project</a>
                 </div>
               </div>
             </div>
                  <div class="panel-footer">
                         <a href="mailto:{{ user.mail }}" data-toggle="tooltip" type="button" class="btn btn-sm btn-primary "><i class="glyphicon glyphicon-envelope"></i></a>
-                        <span class="pull-right">
-                            <a href="{{ url_for('user_update', user_id=user.id) }}" data-original-title="Edit this user" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
-                            <a project="{{ url_for('user_delete', user_id=user.id) }}"  type="button" class="delete btn btn-sm btn-danger delete-user-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><i class="glyphicon glyphicon-remove"></i></a>
-                        </span>
+                        {% if g.user.admin == True or g.user.id == user.id %}
+                            <span class="pull-right">
+                                <a href="{{ url_for('user_update', user_id=user.id) }}" data-original-title="Edit this user" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
+                                <a project="{{ url_for('user_delete', user_id=user.id) }}"  type="button" class="delete btn btn-sm btn-danger delete-user-modal" data-title="Delete" data-toggle="modal" data-target="#delete" ><i class="glyphicon glyphicon-remove"></i></a>
+                            </span>
+                        {% endif %}
                     </div>
           </div>
         </div>

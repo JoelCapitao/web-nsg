@@ -26,7 +26,11 @@
                     {{ render_field_with_value(modify_user_form.function, user.function, 'briefcase') }}
                     {{ render_field_with_value(modify_user_form.service, user.service, 'briefcase') }}
                     {% if g.user.is_admin() == True %}
-                        {{ render_field_with_value(modify_user_form.service, user.service, 'briefcase') }}
+                        <label>Admin</label>
+                        <select name="admin" class="form-control">
+                            <option value="Yes" {% if user.admin == True %}selected{% endif %}>Yes</option>
+                            <option value="No" {% if user.admin == False %}selected{% endif %}>No</option>
+                        </select>
                     {% endif %}
                 </div>
                 <br/>
