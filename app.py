@@ -12,6 +12,9 @@ import pickle, re
 SESSION_TYPE = 'redis'
 SECRET_KEY = 'develop'
 
+#TODO 404 Not Found
+#TODO Methode not allowed
+
 # Initializing Flask-Login configuring it
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -201,9 +204,10 @@ def nsg_processing(excel_worbook, template_file):
 @app.route('/project')
 @login_required
 def project_display_all():
-    projects = Project.query.filter(
+    projects = Project.query.join(project_users, (project_users.c.project_id == Project.id)).filter(
         (Project.user == g.user) |
-        (Project.public.isnot(False))
+        (Project.public.isnot(False)) |
+        (g.user.id == project_users.c.user_id)
     ).all()
     for _project in projects:
         _all_version_of_the_project = _project.version.all()
@@ -216,7 +220,8 @@ def project_display_all():
 
     return render_template('project_display_all.html', project=projects)
 
-@app.route('/project/display/<project_id>', methods=['GET','POST'])
+
+@app.route('/project/display/<int:project_id>', methods=['GET','POST'])
 @login_required
 def project_display(project_id):
     project = Project.query.get(project_id)
@@ -229,7 +234,7 @@ def project_display(project_id):
         # So I replace 'version' by 'current_version'
         setattr(project, 'currentVersion', getattr(last_version_of_the_project, 'version'))
 
-        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], project_id,
+        project_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(project_id),
                                       'v{0}'.format(last_version_of_the_project.version))
         with open(os.path.join(project_folder, 'data.pickle'), 'rb') as f:
             equipments = pickle.load(f)
@@ -237,7 +242,7 @@ def project_display(project_id):
         form = ProjectForm(request.form)
         users = User.query.all()
         project_users = project.users.all()
-        if g.user.id == project.user.id:
+        if g.user == project.user:
             return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
                                    user_can_edit=True, user_can_delete=True, users=users, project_users=project_users)
@@ -245,22 +250,25 @@ def project_display(project_id):
             return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
                                    user_can_edit=True, user_can_delete=False, users=users, project_users=project_users)
-        else:
+        elif project.public is True:
             return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
                                    user_can_edit=False, user_can_delete=False, users=users, project_users=project_users)
+        else:
+            flash("You are not authorized to consult this project", 'error')
+            return redirect(url_for('project_display_all'))
     else:
-        flash("The project does not exist in the database")
+        flash("The project does not exist in the database", 'error')
         return redirect(url_for('project_display_all'))
 
 
-@app.route('/project/<id>/new', methods=['GET','POST'])
+@app.route('/project/<int:id>/new', methods=['POST'])
 @login_required
 def project_new_version(id):
     project = Project.query.get(id)
     all_version_of_the_project = project.version.all()
     last_version = all_version_of_the_project[-1].version
-    new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], id, 'v{0}'.format(last_version + 1))
+    new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(id), 'v{0}'.format(last_version + 1))
     os.makedirs(new_project_folder, exist_ok=True)
 
     form = NewProjectVersionForm(request.form)
@@ -314,7 +322,7 @@ def project_new_version(id):
     return render_template('project.html', form=form)
 
 
-@app.route('/project/<project_id>/upgrade', methods=['GET','POST'])
+@app.route('/project/<int:project_id>/upgrade', methods=['POST'])
 @login_required
 def project_upgrade(project_id):
     if request.method == 'POST':
@@ -355,21 +363,26 @@ def project_upgrade(project_id):
     return redirect(url_for('project_display_all'))
 
 
-@app.route('/project/int:<id>/update', methods=['GET','POST'])
+@app.route('/project/update/<int:id>', methods=['GET','POST'])
 @login_required
 def project_update(id):
     form = ProjectUpdateForm(request.form)
     project = Project.query.get(id)
-    if project == None:
-        flash("The project does not exist in the database")
-        return render_template('project_update.html', form=form)
 
-    if request.method == 'POST' and form.validate():
+    if project is None:
+        flash('The project does not exist in the database', 'error')
+        return redirect(url_for('project_display_all'))
+
+    if request.method == 'GET' and g.user not in project.all_users():
+        flash('You are not allowed to edit this project', 'error')
+        return redirect(url_for('project_display_all'))
+
+    if request.method == 'POST' and form.validate() and g.user in project.all_users():
+        column = dict()
         project_updated = Project(request.form['client'],
                                   request.form['project_name'],
                                   request.form['subproject_name'])
 
-        column = dict()
         for column_name, form_value in [('client', 'client'),
                                         ('projectName', 'project_name'),
                                         ('subProjectName', 'subproject_name')]:
@@ -385,7 +398,7 @@ def project_update(id):
 
     return render_template('project_update.html', form=form, project=project)
 
-@app.route('/project/<id>/addUser', methods=['POST'])
+@app.route('/project/<int:id>/addUser', methods=['POST'])
 @login_required
 def project_add_user(id):
     data_json = request.get_json()
@@ -401,7 +414,7 @@ def project_add_user(id):
                 return json.dumps(user_data)
 
 
-@app.route('/project/<project_id>/removeUser/<user_id>', methods=['POST'])
+@app.route('/project/<int:project_id>/removeUser/<int:user_id>', methods=['POST'])
 @login_required
 def project_remove_user(project_id, user_id):
     project = Project.query.filter_by(id=project_id).first()
@@ -415,7 +428,7 @@ def project_remove_user(project_id, user_id):
         return json.dumps({'is_removed': False})
     return json.dumps({'is_removed': True})
 
-@app.route('/project/<project_id>/users', methods=['GET'])
+@app.route('/project/<int:project_id>/users', methods=['GET'])
 @login_required
 def project_get_users(project_id):
     users = User.query.join(project_users, (project_users.c.user_id == User.id)).filter(project_users.c.project_id == project_id)
@@ -446,79 +459,78 @@ def project_privacy():
                 session_commit()
                 return json.dumps({'status': 'OK', 'public': 'True'})
 
-@app.route('/project/delete/version/<id>')
+@app.route('/project/delete/version/<int:id>')
 @login_required
 def project_delete_version(id):
     project_versioning = ProjectVersioning.query.get(id)
-
     if project_versioning == None:
-        flash("This entry does not exist in the database")
-        return redirect(url_for('user_display_all'))
+        flash('This entry does not exist in the database', 'error')
+        return redirect(url_for('project_display_all'))
 
-    error_when_deleting_project_version = project_versioning.delete(project_versioning)
+    if g.user not in project_versioning.project.all_users():
+        flash('You are not allowed to do this operation', 'error')
+        return redirect(url_for('project_display_all'))
+
+    error_when_deleting_project_version = project_versioning.delete()
     if not error_when_deleting_project_version:
-        flash("Project version was deleted successfully")
+        flash('The version {} of the project was deleted successfully'.format(project_versioning.version), 'success')
     else:
-        flash(error_when_deleting_project_version)
+        flash(error_when_deleting_project_version, 'error')
 
-    return redirect(url_for('project_display', id=project_versioning.projectId))
+    return redirect(url_for('project_display', project_id=project_versioning.projectId))
 
 
-@app.route('/project/delete/<id>')
+@app.route('/project/delete/<int:id>')
 @login_required
 def project_delete(id):
     project = Project.query.get(id)
-    all_versions_of_the_project = project.version.all()
     if project == None:
-        flash("This entry does not exist in the database")
-        return redirect(url_for('user_display_all'))
+        flash('The project does not exist in the database', 'error')
+        return redirect(url_for('project_display_all'))
 
-    project_not_deleted = project.delete(project)
-    if not project_not_deleted:
-        flash("Project was deleted successfully")
+    if g.user != project.user:
+        flash('You are not allowed to do this operation', 'error')
+        return redirect(url_for('project_display_all'))
+
+    error_while_deleting_project = project.delete()
+    if not error_while_deleting_project:
+        flash('The project was successfully deleted', 'success')
     else:
-        error = project_not_deleted
-        flash(error)
-
-    for _version in all_versions_of_the_project:
-        version_not_deleted = _version.delete(_version)
-        if not version_not_deleted:
-            flash("Project version was deleted successfully")
-        else:
-            error = project_not_deleted
-            flash(error)
+        flash(error_while_deleting_project, 'error')
 
     return redirect(url_for('project_display_all'))
 
 
-@app.route('/user')
+@app.route('/user', methods=['GET'])
 @login_required
 def user_display_all():
     user = User.query.all()
     return render_template('user_display_all.html', user=user)
 
-# TODO Refactoring user_display
-@app.route('/user/display/<user_id>', methods=['GET','POST'])
+
+@app.route('/user/display/<int:user_id>', methods=['GET'])
 @login_required
 def user_display(user_id):
     user = User.query.get(user_id)
     if user is None:
-        flash("The user does not exist in the database")
+        flash('The user does not exist in the database', 'error')
         return redirect(url_for('user_display_all'))
-    return render_template('user_display.html', user=user, alert='None', message='')
+    return render_template('user_display.html', user=user)
 
 
-# TODO Refactoring user_update
-# TODO Adding Second form for password
-# TODO Add FORM Helper
-@app.route('/user/update/<user_id>', methods=['GET', 'POST'])
+@app.route('/user/update/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def user_update(user_id):
     modify_user_form = ModifyUserForm(request.form, prefix="modify_user_form")
     user = User.query.get(user_id)
     if user is None:
-        flash("The user does not exist in the database")
+        flash('The user does not exist in the database', 'error')
         return redirect(url_for('user_display_all'))
+
+    if g.user != user:
+        flash('You are not allowed to do this operation', 'error')
+        return redirect(url_for('user_display_all'))
+
     if request.method == 'POST' and modify_user_form.validate():
         data = {'firstname': request.form['modify_user_form-firstname'],
                 'lastname': request.form['modify_user_form-lastname'],
@@ -527,154 +539,54 @@ def user_update(user_id):
                 'function': request.form['modify_user_form-function'],
                 'service': request.form['modify_user_form-service'],
                 'admin': request.form['admin']}
-        print('---------------------------->{}'.format(request.form['admin']))
         error_while_updating_user = user.update(data)
         if not error_while_updating_user:
-            flash("Update was successful")
+            flash('Update was successful', 'success')
             return redirect(url_for('user_display', user_id=user_id))
         else:
-            error = error_while_updating_user
-            flash(error)
+            flash(error_while_updating_user, 'error')
     return render_template('user_update.html', user=user, modify_user_form=modify_user_form, modify_password_form=ModifyPasswordForm(), alert='None', message='')
 
 
-@app.route('/user/update/password/<user_id>', methods=['GET', 'POST'])
+@app.route('/user/update/password/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def user_update_password(user_id):
     modify_password_form = ModifyPasswordForm(request.form)
     user = User.query.get(user_id)
     if user is None:
-        flash("The user does not exist in the database")
+        flash('The user does not exist in the database', 'error')
         return redirect(url_for('user_display_all'))
-    print('---------------->{}'.format(request.form))
-    print(modify_password_form.validate())
+
+    if g.user != user:
+        flash('You are not allowed to do this operation', 'error')
+        return redirect(url_for('user_display_all'))
+
     if request.method == 'POST' and modify_password_form.validate():
-        print(request.form['password'])
         error_while_setting_new_password = user.update_password(request.form['password'])
         if not error_while_setting_new_password:
-            flash("Update was successful")
+            flash('Update was successful', 'success')
             return redirect(url_for('user_display', user_id=user_id))
         else:
-            flash(error_while_setting_new_password)
+            flash(error_while_setting_new_password, 'error')
     return render_template('user_update.html', user=user, modify_user_form=ModifyUserForm(), modify_password_form=modify_password_form, alert='None', message='')
 
 
-@app.route('/user/delete/<user_id>')
+@app.route('/user/delete/<int:user_id>')
 @login_required
 def user_delete(user_id):
     user = User.query.get(user_id)
-    project_of_the_user = Project.query.filter_by(user=user)
-    if user == None:
-        flash("This entry does not exist in the database")
+    if user is None:
+        flash('The user does not exist in the database', 'error')
         return redirect(url_for('user_display_all'))
-    for project in project_of_the_user:
-        project.delete(project)
 
-    error_while_deleting_user = user.delete(user)
-    if error_while_deleting_user:
-        flash("An error occured while deleting the user")
-
-    return redirect(url_for('login'))
-
-
-# TODO Deleting ?
-@app.route('/user/add', methods=['GET','POST'])
-@login_required
-def user_add():
-
-    if request.method == 'POST':
-        user = User(request.form['firstname'],
-                    request.form['lastname'],
-                    request.form['email'],
-                    request.form['password'],
-                    request.form['quadri'],
-                    request.form['function'],
-                    request.form['service'],
-                  )
-        post_add = user.add(user)
-        if not post_add:
-            flash("Add was successful")
-            return redirect(url_for('user_display_all'))
-        else:
-            error = post_add
-            flash(error)
-    return render_template('new_user.html')
-
-
-@app.route('/customer')
-@login_required
-def customer_display_all():
-    customer = Customer.query.all()
-    return render_template('customer_display_all.html', customer=customer)
-
-@app.route('/customer/add', methods=['GET','POST'])
-@login_required
-def customer_add():
-    if request.method == 'POST':
-        customer = Customer(request.form['firstname'],
-                            request.form['lastname'],
-                            request.form['mail'],
-                            request.form['company'],
-                            request.form['landline'],
-                            request.form['function']
-                            )
-        post_add = customer.add(customer)
-        if not post_add:
-            flash("Add was successful")
-            return redirect(url_for('customer_display_all'))
-        else:
-            error = post_add
-            flash(error)
-    return render_template('customer_user.html')
-
-
-@app.route('/customer/update/<id>', methods=['GET','POST'])
-@login_required
-def customer_update(id):
-    customer = Customer.query.get(id)
-    if customer == None:
-        flash("The user does not exist in the database")
-        return redirect(url_for('customer_display_all'))
-    if request.method == 'POST':
-        customer = Customer(request.form['firstname'],
-                            request.form['lastname'],
-                            request.form['mail'],
-                            request.form['company'],
-                            request.form['landline'],
-                            request.form['function']
-                            )
-        customer_update = customer.update(customer)
-        if not customer_update:
-            flash("Update was successful")
-            return redirect(url_for('customer_display', id=id))
-        else:
-            error = user_update
-            flash(error)
-    return render_template('customer_update.html', customer=customer, alert='None', message='')
-
-@app.route('/customer/delete/<id>')
-@login_required
-def customer_delete(id):
-    customer = Customer.query.get(id)
-    if customer == None:
-        flash("This entry does not exist in the database")
-        return redirect(url_for('customer_display_all'))
-    post_delete = customer.delete(customer)
-    if not post_delete:
-        flash("Customer was deleted successfully")
+    error_while_deleting_user = user.delete()
+    if not error_while_deleting_user:
+        flash('The user was successfully deleted', 'success')
+        return redirect(url_for('user_display_all'))
     else:
-        error = post_delete
-        flash(error)
-    return redirect(url_for('customer_display_all'))
+        flash('An error occured while deleting the user', 'error')
+        return redirect(url_for('user_display', user_id=user_id))
 
-@app.route('/customer/display/<id>', methods=['GET','POST'])
-@login_required
-def customer_display(id):
-    customer = Customer.query.get(id)
-    if customer is None:
-        flash("The user does not exist in the database")
-        return redirect(url_for('customer_display_all'))
-    return render_template('customer_display.html', customer=customer, alert='None', message='')
 
 @app.route('/file/<filename>')
 @login_required
@@ -682,6 +594,7 @@ def return_file(filename):
     folder = session['project_folder']
     file = get_file(folder, filename + '.txt')
     return Response(file, mimetype="text/plain")
+
 
 @app.route('/file/<id>/<version>/<filename>')
 @login_required
@@ -696,6 +609,7 @@ def get_file(folder, filename):
         return open(file).read()
     except IOError as exc:
         return str(exc)
+
 
 @app.route('/download/<id>/<version>/<filename>')
 @login_required

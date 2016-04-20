@@ -268,7 +268,7 @@
                             </td>
                             {% if user_can_delete %}
                             <td>
-                                <a href="{{ url_for('project_remove_user', project_id=project.id, user_id=user.id) }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i> Delete User</a>
+                                <a href="{{ url_for('project_remove_user', project_id=project.id, user_id=user.id) }}"  type="button" class="delete-user btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i> Delete User</a>
                             </td>
                             {% endif %}
                         </tr>

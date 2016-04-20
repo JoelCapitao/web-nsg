@@ -6,13 +6,7 @@
         <h2>{{ user.firstname }} {{ user.lastname }}</h2>
     </div>
     <div class="row margin-10">
-    <div class="col-md-5">
-        <div class="alert alert-danger" style="display : {{ alert }}">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
-                ×</button>
-           <span class="glyphicon glyphicon-hand-right"></span> <strong>{{ message }}</strong>
-        </div>
-    </div>
+    {% include 'flashed_messages.html' with context %}
     </div>
       <div class="row">
         <div class="col-md-6 col-lg-6 " >

@@ -80,7 +80,17 @@ $(document).ready(function(){
 $(document).ready(function(){
     $(".delete-user-modal").click(function(e){
         var href = $(this).attr("project");
-            console.log(href);
+            $("#delete-user").attr("href", href);
+    e.preventDefault();
+    })
+});
+
+/**
+ * Delete user within modal
+ */
+$(document).ready(function(){
+    $(".delete-user").click(function(e){
+        var href = $(this).attr("href-modal");
             $("#delete-user").attr("href", href);
     e.preventDefault();
     })
@@ -162,7 +172,7 @@ $('#OnOffButton').on('switchChange.bootstrapSwitch', function (){
 /**
   * Remove an user project
   */
-$(document).on('click', '.delete', function(e){
+$(document).on('click', '.delete-user', function(e){
     e.preventDefault();
     var $button = $(this);
     var href_remove_user = $(this).attr('href');
@@ -184,23 +194,25 @@ $(document).on('click', '.delete', function(e){
 /**
  * Autocomplete input
  */
-$(function autocomplete_input() {
-    var input = $("input#user-input");
-    var id = input.attr('name');
-    var users = {};
-    $.ajax({
-    	url: "/project/" + id + "/users",
-    	async: false,
-    	dataType: 'json',
-    	success: function(data) {
-    		users = data;
-    	}
+var regex = /project\/display/
+if (regex.test(document.location.pathname)) {
+    $(function autocomplete_input() {
+        var input = $("input#user-input");
+        var id = input.attr('name');
+        var users = {};
+        $.ajax({
+            url: "/project/" + id + "/users",
+            async: false,
+            dataType: 'json',
+            success: function (data) {
+                users = data;
+            }
+        });
+        input.autocomplete({
+            source: [users]
+        });
     });
-    input.autocomplete({
-        source: [users]
-    });
-});
-
+}
 
 $('input#user-input').keydown(function(e) {
     if (e.keyCode == '13') {

@@ -6,15 +6,7 @@
     <div class="row">
         <h2>Editing {{ user.firstname }} {{ user.lastname }}</h2>
     </div>
-    <div class="row">
-        <div class="col-sm-5">
-            <div class="alert alert-danger" style="display : {{ alert }}">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
-                    ×</button>
-               <span class="glyphicon glyphicon-hand-right"></span> <strong>{{ message }}</strong>
-            </div>
-        </div>
-    </div>
+    {% include 'flashed_messages.html' with context %}
     <div class="row">
         <div class="col-sm-5">
             <form name="modify_user_form" method="POST" action="{{ url_for('user_update', user_id=user.id) }}" enctype="multipart/form-data">

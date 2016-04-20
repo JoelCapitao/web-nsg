@@ -68,8 +68,11 @@ class User(db.Model):
             setattr(self, key, value)
         return session_commit()
 
-    def delete(self, user):
-        db.session.delete(user)
+    def delete(self):
+        projects = Project.query.filter_by(user=self)
+        for _project in projects:
+            _project.delete()
+        db.session.delete(self)
         return session_commit()
 
 
@@ -163,9 +166,19 @@ class Project(db.Model):
             setattr(project, column_name, value)
         return session_commit()
 
-    def delete(self, project):
+    def delete(self):
+        all_versions_of_the_project = self.version.all()
+        for _version in all_versions_of_the_project:
+            _version.delete()
         db.session.delete(self)
         return session_commit()
+
+    def all_users(self):
+        users = list()
+        users.append(self.user)
+        for _user in self.users:
+            users.append(_user)
+        return users
 
 
 class ProjectVersioning(db.Model):
@@ -194,15 +207,15 @@ class ProjectVersioning(db.Model):
         self.project = project
         self.user = user
 
-    def add(self, projectVersioning):
-        db.session.add(projectVersioning)
+    def add(self, version):
+        db.session.add(version)
         return session_commit()
 
     def update(self):
         return session_commit()
 
-    def delete(self, projectVersioning):
-        db.session.delete(projectVersioning)
+    def delete(self):
+        db.session.delete(self)
         return session_commit()
 
 

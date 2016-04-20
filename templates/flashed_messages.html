@@ -1,0 +1,43 @@
+{% with messages = get_flashed_messages(category_filter=["error"]) %}
+    {% if messages %}
+        <div class="row margin-10">
+            <div class="col-md-7">
+                <div class="alert alert-danger">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    {% for message in messages %}
+                        <strong>Error !</strong> {{ message }}.
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endwith %}
+{% with messages = get_flashed_messages(category_filter=["success"]) %}
+    {% if messages %}
+        <div class="row margin-10">
+            <div class="col-md-7">
+                <div class="alert alert-success">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    {% for message in messages %}
+                        <strong>Success !</strong> {{ message }}.
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endwith %}
+{% with messages = get_flashed_messages(category_filter=["warning"]) %}
+    {% if messages %}
+        <div class="row margin-10">
+            <div class="col-md-7">
+                <div class="alert alert-warning">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    {% for message in messages %}
+                        <strong>Warning !</strong> {{ message }}.
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endwith %}
+

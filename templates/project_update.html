@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Editing Project{% endblock %}
-{% from "_formhelpers.html" import render_field %}
+{% from "_formhelpers.html" import render_field_with_value %}
 {% block content %}
     <div class="container">
         <div class="row">
@@ -24,9 +24,9 @@
         <div class="container">
             <div class="col-sm-7">
                 <form method="POST" action="{{ url_for('project_update', id=project.id) }}" enctype="multipart/form-data">
-                    {{ render_field(form.client, 'building') }}
-                    {{ render_field(form.project_name, 'briefcase') }}
-                    {{ render_field(form.subproject_name, 'folder') }}
+                    {{ render_field_with_value(form.client, project.client, 'building') }}
+                    {{ render_field_with_value(form.project_name, project.projectName, 'briefcase') }}
+                    {{ render_field_with_value(form.subproject_name, project.subProjectName, 'folder') }}
                     <hr>
                     <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
                 </form>
