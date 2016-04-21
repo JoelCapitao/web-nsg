@@ -156,6 +156,7 @@ def project_add():
                           project_data['project_name'],
                           project_data['subproject_name'])
         project.user = g.user
+        project.add_user(g.user)
         post_add = project.add(project)
 
         if project_data['subproject_name']:
@@ -527,9 +528,10 @@ def user_update(user_id):
         flash('The user does not exist in the database', 'error')
         return redirect(url_for('user_display_all'))
 
-    if g.user != user:
-        flash('You are not allowed to do this operation', 'error')
-        return redirect(url_for('user_display_all'))
+    if g.user.is_admin() is False:
+        if g.user != user:
+            flash('You are not allowed to do this operation', 'error')
+            return redirect(url_for('user_display_all'))
 
     if request.method == 'POST' and modify_user_form.validate():
         data = {'firstname': request.form['modify_user_form-firstname'],
@@ -557,9 +559,10 @@ def user_update_password(user_id):
         flash('The user does not exist in the database', 'error')
         return redirect(url_for('user_display_all'))
 
-    if g.user != user:
-        flash('You are not allowed to do this operation', 'error')
-        return redirect(url_for('user_display_all'))
+    if g.user.is_admin() is False:
+        if g.user != user:
+            flash('You are not allowed to do this operation', 'error')
+            return redirect(url_for('user_display_all'))
 
     if request.method == 'POST' and modify_password_form.validate():
         error_while_setting_new_password = user.update_password(request.form['password'])
@@ -579,6 +582,11 @@ def user_delete(user_id):
         flash('The user does not exist in the database', 'error')
         return redirect(url_for('user_display_all'))
 
+    if g.user.is_admin() is False:
+        if g.user != user:
+            flash('You are not allowed to do this operation', 'error')
+            return redirect(url_for('user_display_all'))
+
     error_while_deleting_user = user.delete()
     if not error_while_deleting_user:
         flash('The user was successfully deleted', 'success')
@@ -586,6 +594,8 @@ def user_delete(user_id):
     else:
         flash('An error occured while deleting the user', 'error')
         return redirect(url_for('user_display', user_id=user_id))
+
+
 
 
 @app.route('/file/<filename>')
