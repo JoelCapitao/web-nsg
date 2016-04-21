@@ -135,6 +135,7 @@ def project_new():
             data_of_equipments.append(_data_of_equipment)
 
         versioning_data['fillingRatio'] = '{:.0%}'.format(versioning_data['filled']/versioning_data['to_fill'])
+        versioning_data['description'] = request.form['description']
         session['versioning_data'] = versioning_data
 
         with open(os.path.join(project_folder, 'data.pickle'), 'wb') as f:
@@ -172,8 +173,10 @@ def project_add():
                                                versioning_data['filled'],
                                                versioning_data['fillingRatio'],
                                                zf_name,
+                                               versioning_data['description'],
                                                project,
                                                g.user)
+        print(project_versioning.description)
         project_versioning = project_versioning.add(project_versioning)
 
         if not post_add and not project_versioning:
@@ -244,15 +247,15 @@ def project_display(project_id):
         users = User.query.all()
         project_users = project.users.all()
         if g.user == project.user:
-            return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
+            return render_template('project_display.html', project=project, versions=all_version_of_the_project,
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
                                    user_can_edit=True, user_can_delete=True, users=users, project_users=project_users)
         elif g.user in project_users:
-            return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
+            return render_template('project_display.html', project=project, versions=all_version_of_the_project,
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
                                    user_can_edit=True, user_can_delete=False, users=users, project_users=project_users)
         elif project.public is True:
-            return render_template('project_display.html', project=project, versions=all_version_of_the_project[:-1],
+            return render_template('project_display.html', project=project, versions=all_version_of_the_project,
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),
                                    user_can_edit=False, user_can_delete=False, users=users, project_users=project_users)
         else:
@@ -274,6 +277,8 @@ def project_new_version(id):
 
     form = NewProjectVersionForm(request.form)
     if request.method == 'POST' and form.validate():
+        print(request.form['description'])
+        print('-------------')
 
         excel_file = request.files['excel_file']
         excel_file_path = os.path.join(new_project_folder, secure_filename(excel_file.filename))
@@ -286,7 +291,6 @@ def project_new_version(id):
         versioning_data = {'to_fill': 0, 'filled': 0}
         for _file, _path in [('excel_file', excel_file.filename), ('template_file', template_file.filename)]:
             versioning_data[_file] = _path
-            print(_path)
 
         try:
             equipments, wb, hostnames = nsg_processing(excel_file_path, template_file_path)
@@ -315,6 +319,7 @@ def project_new_version(id):
 
         versioning_data['fillingRatio'] = '{:.0%}'.format(versioning_data['filled']/versioning_data['to_fill'])
         versioning_data['project_folder'] = new_project_folder
+        versioning_data['description'] = request.form['description']
         session['versioning_data'] = versioning_data
 
         return render_template('project_upgrade_preview.html', id=project.id,
@@ -348,6 +353,7 @@ def project_upgrade(project_id):
                                         versioning_data['filled'],
                                         versioning_data['fillingRatio'],
                                         zf_name,
+                                        versioning_data['description'],
                                         project,
                                         g.user)
         error_in_creation_of_new_version = new_version.add(new_version)

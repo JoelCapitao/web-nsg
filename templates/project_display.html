@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import render_field, render_upload_file %}
+{% from "_formhelpers.html" import render_field, render_upload_file, render_input_textarea %}
 {% block title %}{{ project.client }} - {{ project.projectName }}{% endblock %}
 {% block content %}
     <div class="row margin-10">
@@ -94,9 +94,27 @@
                           </div>
                       </div>
                   </div>
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Comments</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12 col-lg-12">
+                                    {% for version in versions %}
+                                        {{ version.description }}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                   <div class="row">
                       <div class="col-md-12 col-lg-12 " >
-                          <div class="panel panel-default">
+                          <div class="panel panel-success">
                             <div class="panel-heading">
                               <h3 class="panel-title">Old versions</h3>
                             </div>
@@ -148,6 +166,7 @@
                             <form method="POST" action="/project/{{ project.id }}/new" enctype="multipart/form-data">
                                 {{ render_upload_file(form.excel_file, 'file-excel-o') }}
                                 {{ render_upload_file(form.template_file, 'file-code-o') }}
+                                {{ render_input_textarea(form.description, 'description') }}
                                 <hr>
                                 <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>
                             </form>

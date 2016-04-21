@@ -62,3 +62,10 @@
     </div>
 {% endmacro %}
 
+{% macro render_input_textarea(field, name) %}
+     <div class="form-group {% if field.errors %}has-error{% endif %}">
+         <label for="comment">{{ field.label }}</label>
+         <textarea class="form-control" rows="5" id="{{ name }}" name="{{ name }}"></textarea>
+     </div>
+{% endmacro %}
+

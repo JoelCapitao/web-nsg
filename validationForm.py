@@ -22,12 +22,15 @@ class ProjectForm(Form):
     client = StringField('Client', [validators.DataRequired(), validators.Length(max=25)])
     project_name = StringField('Project Name', [validators.DataRequired(), validators.Length(max=35)])
     subproject_name = StringField('Subproject Name', [validators.optional(), validators.Length(max=35)])
+    description = StringField('Description of the version', [validators.optional(), validators.Length(max=300)])
     excel_file = wtfFileField(u'Excel Workbook', validators=[check_excelfile])
     template_file = FileField(u'Template File', validators=[check_templatefile])
 
 class NewProjectVersionForm(Form):
     excel_file = FileField(u'Excel Workbook', validators=[check_excelfile])
     template_file = FileField(u'Template File', validators=[check_templatefile])
+    description = StringField('Description of the version', [validators.optional(), validators.Length(max=300)])
+
 
 class ProjectUpdateForm(Form):
     client = StringField('Client', [validators.DataRequired(), validators.Length(max=25)])
