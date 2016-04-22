@@ -254,6 +254,7 @@ def project_display(project_id):
         form = ProjectForm(request.form)
         users = User.query.all()
         project_users = project.users.all()
+        print(all_version_of_the_project)
         if g.user == project.user:
             return render_template('project_display.html', project=project, versions=all_version_of_the_project,
                                form=form, alert='None', message='', equipments=equipments, iterator=Integer(1),

@@ -98,22 +98,8 @@
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-md-12 col-lg-12">
-                                    <table id="comments" class="table table-bordred table-striped" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Version</th>
-                                            <th>Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for version in versions %}
-                                            <tr>
-                                                <th class="col-lg-2"><h4>{{ version.version }}</h4></th>
-                                                <th><h5>{{ version.description }}</h5></th>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                    </table>
+                                    <h4><strong>Description</strong></h4>
+                                    <h5>{{ versions[-1].description }}</h5>
                                 </div>
                             </div>
                         </div>
@@ -132,24 +118,35 @@
                                         <th>Percentage</th>
                                         <th>Excel File</th>
                                         <th>Template File</th>
+                                        <th>Description</th>
                                         <th>Zip File</th>
                                         {% if user_can_delete %}
-                                        <th></th>
+                                            <th></th>
                                         {% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for version in versions %}
+                                    {% for version in versions[::-1][1:] %}
                                     <tr>
                                         <td>{{ version.version }}</td>
                                         <td>{{ version.numberOfVarFilled }}/{{ version.numberOfVarToFill  }}</td>
                                         <td>{{ version.fillingRatio }}</td>
                                         <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
                                         <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
+                                        <td data-toggle="collapse" data-target="#version{{ iterator.increment() }}" class="accordion-toggle"><button type="button" class="btn btn-xs btn-info"><span class="fa fa-pencil-square-o"></span></button></td>
                                         <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.zipFile }}" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
                                         {% if user_can_delete %}
-                                        <th><a href="/project/delete/version/{{ version.id }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a></th>
+                                        <td><a href="/project/delete/version/{{ version.id }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a></td>
                                         {% endif %}
+                                    </tr>
+                                    <tr>
+                                        <td colspan="12" class="hiddenRow">
+                                            <div class="accordian-body collapse" id="version{{ iterator.value() }}">
+                                                <div class="col-sm-12">
+                                                    <p>{{ version.description }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -225,10 +222,9 @@
                         <td>{{ equipment['Type'] }}</td>
                         <td>{{ equipment['filling_ratio']  }}</td>
                         <td>{{ equipment['filling_ratio_in_percentage'] }}</td>
-                        <td data-toggle="collapse" data-target="#equipment{{ iterator.increment() }}" class="accordion-toggle"><button type='button' class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
+                        <td data-toggle="collapse" data-target="#equipment{{ iterator.increment() }}" class="accordion-toggle"><button type='button' class="btn btn-info btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
                         <td><a href="/file/{{ project.id }}/{{ project.currentVersion }}/{{ equipment['Hostname'] }}" role="button" target="_blank"><i class="fa fa-file-code-o fa-1x"></i></a></td>
                         <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ equipment['Hostname'] }}.txt" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
-
                     </tr>
                     <tr>
                         <td colspan="12" class="hiddenRow">
