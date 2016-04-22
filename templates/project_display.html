@@ -54,11 +54,11 @@
                           </tr>
                           <tr>
                             <td><strong>Excel File</strong></td>
-                            <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.excelFile }}" target="_blank" download="">{{ project.excelFile }}</a></td>
+                            <td><a href="/download/{{ project.id }}/{{ project.currentVersion.replace('.','') }}/{{ project.excelFile }}" target="_blank" download="">{{ project.excelFile }}</a></td>
                           </tr>
                           <tr>
                             <td><strong>Template File</strong></td>
-                            <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.templateFile }}" target="_blank" download="">{{ project.templateFile }}</a></td>
+                            <td><a href="/download/{{ project.id }}/{{ project.currentVersion.replace('.','') }}/{{ project.templateFile }}" target="_blank" download="">{{ project.templateFile }}</a></td>
                           </tr>
                         </tbody>
                       </table>
@@ -89,7 +89,7 @@
                       </table>
                           <div class="col-md-6 col-md-offset-4">
                               <div class="row">
-                                  <a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.zipFile }}"><i class="fa fa-download fa-5x" ></i></a>
+                                  <a href="/download/{{ project.id }}/{{ project.currentVersion.replace('.','') }}/{{ project.zipFile }}"><i class="fa fa-download fa-5x" ></i></a>
                               </div>
                           </div>
                       </div>
@@ -131,10 +131,10 @@
                                         <td>{{ version.version }}</td>
                                         <td>{{ version.numberOfVarFilled }}/{{ version.numberOfVarToFill  }}</td>
                                         <td>{{ version.fillingRatio }}</td>
-                                        <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
-                                        <td><a href="/download/{{ project.id }}/{{ version.version }}/{{ version.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
+                                        <td><a href="/download/{{ project.id }}/{{ version.version.replace('.','') }}/{{ version.excelFile }}" target="_blank" download=""><span class="fa fa-file-excel-o fa-1x"></span></a></td>
+                                        <td><a href="/download/{{ project.id }}/{{ version.version.replace('.','') }}/{{ version.templateFile }}" target="_blank" download=""><span class="fa fa-file-code-o fa-1x"></span></a></td>
                                         <td data-toggle="collapse" data-target="#version{{ iterator.increment() }}" class="accordion-toggle"><button type="button" class="btn btn-xs btn-info"><span class="fa fa-pencil-square-o"></span></button></td>
-                                        <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ project.zipFile }}" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
+                                        <td><a href="/download/{{ project.id }}/{{ project.currentVersion.replace('.','') }}/{{ project.zipFile }}" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
                                         {% if user_can_delete %}
                                         <td><a href="/project/delete/version/{{ version.id }}"  type="button" class="delete btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a></td>
                                         {% endif %}
@@ -223,8 +223,8 @@
                         <td>{{ equipment['filling_ratio']  }}</td>
                         <td>{{ equipment['filling_ratio_in_percentage'] }}</td>
                         <td data-toggle="collapse" data-target="#equipment{{ iterator.increment() }}" class="accordion-toggle"><button type='button' class="btn btn-info btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
-                        <td><a href="/file/{{ project.id }}/{{ project.currentVersion }}/{{ equipment['Hostname'] }}" role="button" target="_blank"><i class="fa fa-file-code-o fa-1x"></i></a></td>
-                        <td><a href="/download/{{ project.id }}/{{ project.currentVersion }}/{{ equipment['Hostname'] }}.txt" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
+                        <td><a href="/file/{{ project.id }}/{{ project.currentVersion.replace('.','') }}/{{ equipment['Hostname'] }}" role="button" target="_blank"><i class="fa fa-file-code-o fa-1x"></i></a></td>
+                        <td><a href="/download/{{ project.id }}/{{ project.currentVersion.replace('.','') }}/{{ equipment['Hostname'] }}.txt" target="_blank" download=""><span class="glyphicon glyphicon-download"></span></a></td>
                     </tr>
                     <tr>
                         <td colspan="12" class="hiddenRow">
