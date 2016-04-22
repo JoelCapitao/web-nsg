@@ -95,25 +95,31 @@
                       </div>
                   </div>
                     <div class="row">
-                        <div class="col-md-12 col-lg-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Comments</h3>
-                                </div>
-                            </div>
-                        </div>
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-md-12 col-lg-12">
-                                    {% for version in versions %}
-                                        {{ version.description }}
-                                    {% endfor %}
+                                    <table id="comments" class="table table-bordred table-striped" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Version</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for version in versions %}
+                                            <tr>
+                                                <th class="col-lg-2"><h4>{{ version.version }}</h4></th>
+                                                <th><h5>{{ version.description }}</h5></th>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
                   <div class="row">
-                      <div class="col-md-12 col-lg-12 " >
+                      <div class="col-md-12 col-lg-12">
                           <div class="panel panel-success">
                             <div class="panel-heading">
                               <h3 class="panel-title">Old versions</h3>
@@ -166,6 +172,7 @@
                             <form method="POST" action="/project/{{ project.id }}/new" enctype="multipart/form-data">
                                 {{ render_upload_file(form.excel_file, 'file-excel-o') }}
                                 {{ render_upload_file(form.template_file, 'file-code-o') }}
+                                {{ render_upload_file(form.version, 'folder') }}
                                 {{ render_input_textarea(form.description, 'description') }}
                                 <hr>
                                 <button type="submit" class="btn btn-primary col-xs-12"  data-toggle="modal" data-target="#processing-modal">Submit</button>

@@ -184,7 +184,7 @@ class Project(db.Model):
 class ProjectVersioning(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    version = db.Column(db.Integer, nullable=False)
+    version = db.Column(db.String(4))
     excelFile = db.Column(db.String(255))
     templateFile = db.Column(db.String(255))
     numberOfVarToFill = db.Column(db.Integer)

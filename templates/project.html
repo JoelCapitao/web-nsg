@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}New Project{% endblock %}
-{% from "_formhelpers.html" import render_field, render_upload_file, render_input_textarea %}
+{% from "_formhelpers.html" import render_field, render_upload_file, render_input_textarea, render_field_without_fa %}
 {% block content %}
     <div class="container">
     <div class="col-sm-10">
@@ -28,6 +28,7 @@
                     {{ render_field(form.client, 'building') }}
                     {{ render_field(form.project_name, 'briefcase') }}
                     {{ render_field(form.subproject_name, 'folder') }}
+                    {{ render_field(form.version, 'folder-open') }}
                     {{ render_input_textarea(form.description, 'description') }}
                     {{ render_upload_file(form.excel_file, 'file-excel-o') }}
                     {{ render_upload_file(form.template_file, 'file-code-o') }}

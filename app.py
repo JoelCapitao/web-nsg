@@ -136,6 +136,7 @@ def project_new():
 
         versioning_data['fillingRatio'] = '{:.0%}'.format(versioning_data['filled']/versioning_data['to_fill'])
         versioning_data['description'] = request.form['description']
+        versioning_data['version'] = request.form['version']
         session['versioning_data'] = versioning_data
 
         with open(os.path.join(project_folder, 'data.pickle'), 'wb') as f:
@@ -159,14 +160,20 @@ def project_add():
         project.user = g.user
         project.add_user(g.user)
         post_add = project.add(project)
+        version_number_formatted_without_the_dot = versioning_data['version'].replace('.', '')
 
         if project_data['subproject_name']:
-            zf_name = "scripts-{0}-{1}-{2}-v1.zip".format(project_data['client'], project_data['project_name'], project_data['subproject_name'])
+            zf_name = "scripts-{0}-{1}-{2}-v{3}.zip".format(project_data['client'],
+                                                            project_data['project_name'],
+                                                            project_data['subproject_name'],
+                                                            version_number_formatted_without_the_dot)
         else:
-            zf_name = "scripts-{0}-{1}-v1.zip".format(project_data['client'], project_data['project_name'])
+            zf_name = "scripts-{0}-{1}-v{2}.zip".format(project_data['client'],
+                                                        project_data['project_name'],
+                                                        version_number_formatted_without_the_dot)
 
         project = last_project()
-        project_versioning = ProjectVersioning(1,
+        project_versioning = ProjectVersioning(versioning_data['version'],
                                                versioning_data['excel_file'],
                                                versioning_data['template_file'],
                                                versioning_data['to_fill'],
@@ -176,11 +183,12 @@ def project_add():
                                                versioning_data['description'],
                                                project,
                                                g.user)
-        print(project_versioning.description)
         project_versioning = project_versioning.add(project_versioning)
 
         if not post_add and not project_versioning:
-            new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(project.id), 'v1')
+            new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'],
+                                              str(project.id),
+                                              'v{}'.format(version_number_formatted_without_the_dot))
             move(session['project_folder'], new_project_folder)
 
             try:
@@ -239,7 +247,7 @@ def project_display(project_id):
         setattr(project, 'currentVersion', getattr(last_version_of_the_project, 'version'))
 
         project_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(project_id),
-                                      'v{0}'.format(last_version_of_the_project.version))
+                                      'v{0}'.format(last_version_of_the_project.version.replace('.', '')))
         with open(os.path.join(project_folder, 'data.pickle'), 'rb') as f:
             equipments = pickle.load(f)
 
@@ -269,16 +277,17 @@ def project_display(project_id):
 @app.route('/project/<int:id>/new', methods=['POST'])
 @login_required
 def project_new_version(id):
-    project = Project.query.get(id)
-    all_version_of_the_project = project.version.all()
-    last_version = all_version_of_the_project[-1].version
-    new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(id), 'v{0}'.format(last_version + 1))
-    os.makedirs(new_project_folder, exist_ok=True)
 
     form = NewProjectVersionForm(request.form)
     if request.method == 'POST' and form.validate():
-        print(request.form['description'])
-        print('-------------')
+
+        version_number_formatted_without_the_dot = request.form['version'].replace('.', '')
+
+        project = Project.query.get(id)
+        new_project_folder = os.path.join(app.config['UPLOAD_FOLDER'],
+                                          str(id),
+                                          'v{0}'.format(version_number_formatted_without_the_dot))
+        os.makedirs(new_project_folder, exist_ok=True)
 
         excel_file = request.files['excel_file']
         excel_file_path = os.path.join(new_project_folder, secure_filename(excel_file.filename))
@@ -320,12 +329,13 @@ def project_new_version(id):
         versioning_data['fillingRatio'] = '{:.0%}'.format(versioning_data['filled']/versioning_data['to_fill'])
         versioning_data['project_folder'] = new_project_folder
         versioning_data['description'] = request.form['description']
+        versioning_data['version'] = request.form['version']
         session['versioning_data'] = versioning_data
 
         return render_template('project_upgrade_preview.html', id=project.id,
                                equipments=data_of_equipments, iterator=Integer(1))
 
-    return render_template('project.html', form=form)
+    return redirect(url_for('project_display', project_id=id))
 
 
 @app.route('/project/<int:project_id>/upgrade', methods=['POST'])
@@ -334,19 +344,19 @@ def project_upgrade(project_id):
     if request.method == 'POST':
         versioning_data = session.get('versioning_data')
         project = Project.query.get(project_id)
-        last_version_of_the_project = last_version_of_the_project_id_equal_to(project_id)
 
+        version_number_formatted_without_the_dot = versioning_data['version'].replace('.', '')
         if project.subProjectName:
             zf_name = "scripts-{0}-{1}-{2}-v{3}.zip".format(project.client,
                                                             project.projectName,
                                                             project.subProjectName,
-                                                            last_version_of_the_project.version + 1)
+                                                            version_number_formatted_without_the_dot)
         else:
             zf_name = "scripts-{0}-{1}-v{2}.zip".format(project.client,
                                                         project.projectName,
-                                                        last_version_of_the_project.version + 1)
+                                                        version_number_formatted_without_the_dot)
 
-        new_version = ProjectVersioning(last_version_of_the_project.version + 1,
+        new_version = ProjectVersioning(versioning_data['version'],
                                         versioning_data['excel_file'],
                                         versioning_data['template_file'],
                                         versioning_data['to_fill'],
